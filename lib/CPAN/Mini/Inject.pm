@@ -22,7 +22,7 @@ Version 0.23
 =cut
 
 our $VERSION = '0.23';
-our @ISA=qw( CPAN::Mini );
+our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
 
@@ -66,9 +66,9 @@ Create a new CPAN::Mini::Inject object.
 =cut
 
 sub new {
-  my $class=shift;
-  my $self={};
-  bless $self,$class;
+  my $class = shift;
+  my $self  = {};
+  bless $self, $class;
   return $self;
 }
 
@@ -98,11 +98,11 @@ none is found.
 =cut
 
 sub loadcfg {
-  my $self=shift;
-  my $cfgfile=shift||_findcfg();
+  my $self = shift;
+  my $cfgfile = shift || _findcfg();
 
-  croak 'Unable to find config file' unless($cfgfile); 
-  $self->{cfgfile}=$cfgfile;
+  croak 'Unable to find config file' unless ( $cfgfile );
+  $self->{cfgfile} = $cfgfile;
   return $self;
 }
 
@@ -154,26 +154,29 @@ If either local or remote are not defined parsecfg croaks.
 =cut
 
 sub parsecfg {
-  my $self=shift;
-  my $cfgfile=shift;
-  
-  delete $self->{config} if(defined($self->{config}));
+  my $self    = shift;
+  my $cfgfile = shift;
 
-  my %required=( local => 1, remote => 1 );
+  delete $self->{config} if ( defined( $self->{config} ) );
 
-  delete $self->{cfgfile} if($cfgfile);
-  $self->loadcfg($cfgfile) unless($self->{cfgfile});
+  my %required = ( local => 1, remote => 1 );
 
-  if(-r $self->{cfgfile}) {
-    open(CFGFILE,$self->{cfgfile});
-    while(<CFGFILE>) {
-      next if(/^\s*#/);
-      $self->{config}{$1}=$2 if(/([^:\s]+)\s*:\s*(.*)$/);
-      delete $required{$1} if(defined($required{$1}));
+  delete $self->{cfgfile} if ( $cfgfile );
+  $self->loadcfg( $cfgfile ) unless ( $self->{cfgfile} );
+
+  if ( -r $self->{cfgfile} ) {
+    open( CFGFILE, $self->{cfgfile} );
+    while ( <CFGFILE> ) {
+      next if ( /^\s*#/ );
+      $self->{config}{$1} = $2 if ( /([^:\s]+)\s*:\s*(.*)$/ );
+      delete $required{$1} if ( defined( $required{$1} ) );
     }
-    close(CFGFILE);
+    close( CFGFILE );
 
-    croak 'Required parameter(s): '.join(' ',keys(%required)).' missing.' if(keys(%required));
+    croak 'Required parameter(s): '
+     . join( ' ', keys( %required ) )
+     . ' missing.'
+     if ( keys( %required ) );
   }
   return $self;
 }
@@ -191,27 +194,27 @@ C<testremote> accepts an optional parameter to enable verbose mode.
 =cut
 
 sub testremote {
-  my $self=shift;
-  my $verbose=shift;
+  my $self    = shift;
+  my $verbose = shift;
 
-  $self->{site}=undef if($self->{site});
+  $self->{site} = undef if ( $self->{site} );
 
-  $ENV{FTP_PASSIVE}=1 if($self->_cfg('passive'));
+  $ENV{FTP_PASSIVE} = 1 if ( $self->_cfg( 'passive' ) );
 
-  foreach my $site (split(/\s+/,$self->_cfg('remote'))) {
-    $site.='/' unless($site=~m/\/$/);
+  foreach my $site ( split( /\s+/, $self->_cfg( 'remote' ) ) ) {
+    $site .= '/' unless ( $site =~ m/\/$/ );
 
-    print "Testing site: $site\n" if($verbose);
+    print "Testing site: $site\n" if ( $verbose );
 
-    if(get($site.'authors/01mailrc.txt.gz')) {
-      $self->{site}=$site;
-      print "\n$site selected.\n" if($verbose);
+    if ( get( $site . 'authors/01mailrc.txt.gz' ) ) {
+      $self->{site} = $site;
+      print "\n$site selected.\n" if ( $verbose );
       last;
     }
   }
 
-  croak "Unable to connect to any remote site" unless($self->{site});
-  
+  croak "Unable to connect to any remote site" unless ( $self->{site} );
+
   return $self;
 }
 
@@ -222,22 +225,24 @@ This is a subclass of CPAN::Mini.
 =cut
 
 sub update_mirror {
-  my $self=shift;
-  my %options=@_;
+  my $self    = shift;
+  my %options = @_;
 
-  croak 'Can not write to local: '.$self->_cfg('local') 
-    unless(-w $self->_cfg('local'));
+  croak 'Can not write to local: ' . $self->_cfg( 'local' )
+   unless ( -w $self->_cfg( 'local' ) );
 
-  $ENV{FTP_PASSIVE}=1 if($self->_cfg('passive'));
+  $ENV{FTP_PASSIVE} = 1 if ( $self->_cfg( 'passive' ) );
 
-  $options{local}||=$self->_cfg('local');
-  $options{trace}||=0;
-  $options{skip_perl}||=$self->_cfg('perl')||1;
+  $options{local}     ||= $self->_cfg( 'local' );
+  $options{trace}     ||= 0;
+  $options{skip_perl} ||= $self->_cfg( 'perl' ) || 1;
 
-  $self->testremote($options{trace}) unless($self->{site} || $options{remote});
-  $options{remote}||=$self->{site};
+  $self->testremote( $options{trace} )
+   unless ( $self->{site} || $options{remote} );
+  $options{remote} ||= $self->{site};
 
-  $options{dirmode}||=oct($self->_cfg('dirmode')||sprintf('0%o',0777 &~ umask()));
+  $options{dirmode} ||= oct( $self->_cfg( 'dirmode' )
+     || sprintf( '0%o', 0777 & ~umask() ) );
 
   CPAN::Mini->update_mirror( %options );
 }
@@ -279,33 +284,42 @@ The tar.gz of the module.
 =cut
 
 sub add {
-  my $self=shift;
-  my %options=@_;
+  my $self    = shift;
+  my %options = @_;
 
-  my $optionchk=_optionchk(\%options,qw/module authorid version file/);
+  my $optionchk
+   = _optionchk( \%options, qw/module authorid version file/ );
 
-  croak "Required option not specified: $optionchk" if($optionchk);
-  croak "No repository configured" unless($self->_cfg('repository'));
-  croak "Can not write to repository: ".$self->_cfg('repository')
-    unless( -w $self->_cfg('repository') );
-  croak "Can not read module file: $options{file}" unless( -r $options{file});
+  croak "Required option not specified: $optionchk" if ( $optionchk );
+  croak "No repository configured"
+   unless ( $self->_cfg( 'repository' ) );
+  croak "Can not write to repository: " . $self->_cfg( 'repository' )
+   unless ( -w $self->_cfg( 'repository' ) );
+  croak "Can not read module file: $options{file}"
+   unless ( -r $options{file} );
 
-  my $modulefile=basename($options{file});
-  $self->readlist unless(exists($self->{modulelist}));
+  my $modulefile = basename( $options{file} );
+  $self->readlist unless ( exists( $self->{modulelist} ) );
 
-  $options{authorid}=uc($options{authorid});
-  $self->{authdir}=$self->_authordir($options{authorid},$self->_cfg('repository'));
+  $options{authorid} = uc( $options{authorid} );
+  $self->{authdir} = $self->_authordir( $options{authorid},
+    $self->_cfg( 'repository' ) );
 
-  my $target=$self->_cfg('repository').'/authors/id/'.$self->{authdir}.'/'.basename($options{file});
+  my $target
+   = $self->_cfg( 'repository' )
+   . '/authors/id/'
+   . $self->{authdir} . '/'
+   . basename( $options{file} );
 
-  copy($options{file},dirname($target))
-    or croak "Copy failed: $!";
+  copy( $options{file}, dirname( $target ) )
+   or croak "Copy failed: $!";
 
-  $self->_updperms($target);
+  $self->_updperms( $target );
 
-  push(@{$self->{modulelist}},
-    _fmtmodule($options{module},
-      $self->{authdir}."/$modulefile",
+  push(
+    @{ $self->{modulelist} },
+    _fmtmodule(
+      $options{module}, $self->{authdir} . "/$modulefile",
       $options{version}
     )
   );
@@ -325,32 +339,33 @@ as it's injected.
 =cut
 
 sub inject {
-  my $self=shift;
-  my $verbose=shift;
+  my $self    = shift;
+  my $verbose = shift;
 
-  my $dirmode=oct($self->_cfg('dirmode')) if($self->_cfg('dirmode'));
-  $self->readlist unless(exists($self->{modulelist}));
+  my $dirmode = oct( $self->_cfg( 'dirmode' ) )
+   if ( $self->_cfg( 'dirmode' ) );
+  $self->readlist unless ( exists( $self->{modulelist} ) );
 
   my %updatedir;
-  foreach my $modline (@{$self->{modulelist}}) {
-    my ($module,$version,$file)=split(/\s+/,$modline);
-    my $target=$self->_cfg('local').'/authors/id/'.$file;
-    my $source=$self->_cfg('repository').'/authors/id/'.$file;
+  foreach my $modline ( @{ $self->{modulelist} } ) {
+    my ( $module, $version, $file ) = split( /\s+/, $modline );
+    my $target = $self->_cfg( 'local' ) . '/authors/id/' . $file;
+    my $source = $self->_cfg( 'repository' ) . '/authors/id/' . $file;
 
-    $updatedir{dirname($file)}=1;
+    $updatedir{ dirname( $file ) } = 1;
 
-    _mkpath( [ dirname($target) ],$dirmode ); 
-    copy($source,dirname($target)) 
-      or croak "Copy $source to ".dirname($target)." failed: $!";
+    _mkpath( [ dirname( $target ) ], $dirmode );
+    copy( $source, dirname( $target ) )
+     or croak "Copy $source to " . dirname( $target ) . " failed: $!";
 
-    $self->_updperms($target);
-    print "$target ... injected\n" if($verbose);
+    $self->_updperms( $target );
+    print "$target ... injected\n" if ( $verbose );
   }
 
-  foreach my $dir (keys(%updatedir)) {
-    my $authdir=$self->_cfg('local')."/authors/id/$dir";
-    updatedir($authdir);
-    $self->_updperms("$authdir/CHECKSUMS");
+  foreach my $dir ( keys( %updatedir ) ) {
+    my $authdir = $self->_cfg( 'local' ) . "/authors/id/$dir";
+    updatedir( $authdir );
+    $self->_updperms( "$authdir/CHECKSUMS" );
   }
 
   $self->updpackages;
@@ -367,15 +382,15 @@ injected module information.
 =cut
 
 sub updpackages {
-  my $self=shift;
+  my $self = shift;
 
-  my @modules=sort(@{$self->{modulelist}});
+  my @modules = sort( @{ $self->{modulelist} } );
 
-  my $packages=$self->_readpkgs;
+  my $packages = $self->_readpkgs;
 
-  $packages=_uniq($packages,\@modules);
+  $packages = _uniq( $packages, \@modules );
 
-  $self->_writepkgs($packages);
+  $self->_writepkgs( $packages );
 
 }
 
@@ -387,32 +402,32 @@ stub information should the author not actually exist on CPAN
 =cut
 
 sub updauthors {
-  my $self=shift;
+  my $self = shift;
 
-  my $repo_authors = $self->_readauthors;
-  my %author_ids_in_repo = map{
-    my ($id) = $_ =~ /alias \s+ (\S+)/xms;
+  my $repo_authors       = $self->_readauthors;
+  my %author_ids_in_repo = map {
+    my ( $id ) = $_ =~ /alias \s+ (\S+)/xms;
     $id => 1;
   } @$repo_authors;
 
   my @authors;
   my %authors_added;
   AUTHOR:
-  foreach my $modline (@{$self->{modulelist}}) {
-    my ($module,$version,$file)=split(/\s+/,$modline);
-    my $author = ( split("/",$file,4) )[2]; # extract the author from the path
+  foreach my $modline ( @{ $self->{modulelist} } ) {
+    my ( $module, $version, $file ) = split( /\s+/, $modline );
+    my $author
+     = ( split( "/", $file, 4 ) )[2]; # extract the author from the path
 
     next AUTHOR if defined $author_ids_in_repo{$author};
     next AUTHOR if defined $authors_added{$author};
 
-    push @$repo_authors, sprintf(
-        'alias %-10s "Custom Non-CPAN author <CENSORED>"',
-        $author
-    );
+    push @$repo_authors,
+     sprintf( 'alias %-10s "Custom Non-CPAN author <CENSORED>"',
+      $author );
     $authors_added{$author} = 1;
   }
 
-  $self->_writeauthors($repo_authors);
+  $self->_writeauthors( $repo_authors );
 
 }
 
@@ -423,20 +438,23 @@ Load the repository's modulelist.
 =cut
 
 sub readlist {
-  my $self=shift;
+  my $self = shift;
 
-  $self->{modulelist}=undef;
+  $self->{modulelist} = undef;
 
-  return $self unless(-e $self->_cfg('repository').'/modulelist');
-  croak 'Can not read module list: '.$self->_cfg('repository').'/modulelist' 
-    unless(-r $self->_cfg('repository').'/modulelist');
+  return $self
+   unless ( -e $self->_cfg( 'repository' ) . '/modulelist' );
+  croak 'Can not read module list: '
+   . $self->_cfg( 'repository' )
+   . '/modulelist'
+   unless ( -r $self->_cfg( 'repository' ) . '/modulelist' );
 
-  open(MODLIST,$self->_cfg('repository').'/modulelist');
-  while(<MODLIST>) {
+  open( MODLIST, $self->_cfg( 'repository' ) . '/modulelist' );
+  while ( <MODLIST> ) {
     chomp;
-    push(@{$self->{modulelist}},$_);
+    push( @{ $self->{modulelist} }, $_ );
   }
-  close(MODLIST);
+  close( MODLIST );
 
   return $self;
 }
@@ -448,111 +466,127 @@ Write to the repository modulelist.
 =cut
 
 sub writelist {
-  my $self=shift;
+  my $self = shift;
 
-  croak 'Can not write module list: '.$self->_cfg('repository')."/modulelist ERROR: $!" unless(-w $self->{config}{repository}.'/modulelist' || -w $self->{config}{repository});
-  return $self unless(defined($self->{modulelist}));
+  croak 'Can not write module list: '
+   . $self->_cfg( 'repository' )
+   . "/modulelist ERROR: $!"
+   unless ( -w $self->{config}{repository} . '/modulelist'
+    || -w $self->{config}{repository} );
+  return $self unless ( defined( $self->{modulelist} ) );
 
-  open(MODLIST,'>'.$self->_cfg('repository').'/modulelist');
-  for(sort(@{$self->{modulelist}})) {
+  open( MODLIST, '>' . $self->_cfg( 'repository' ) . '/modulelist' );
+  for ( sort( @{ $self->{modulelist} } ) ) {
     chomp;
     print MODLIST "$_\n";
   }
-  close(MODLIST);
+  close( MODLIST );
 
-  $self->_updperms($self->_cfg('repository').'/modulelist');
+  $self->_updperms( $self->_cfg( 'repository' ) . '/modulelist' );
 
   return $self;
 }
 
 sub _updperms {
-  my ($self,$file)=@_;
+  my ( $self, $file ) = @_;
 
-  chmod(oct($self->_cfg('dirmode')) & 06666,$file) if($self->_cfg('dirmode'));
+  chmod( oct( $self->_cfg( 'dirmode' ) ) & 06666, $file )
+   if ( $self->_cfg( 'dirmode' ) );
 }
 
 sub _optionchk {
-  my ($options,@list)=@_;
+  my ( $options, @list ) = @_;
   my @missing;
 
-  foreach my $option (@list) {
-    push(@missing, $option) unless(defined($$options{$option}));
+  foreach my $option ( @list ) {
+    push( @missing, $option ) unless ( defined( $$options{$option} ) );
   }
 
-  return join(' ',@missing) if(@missing);
+  return join( ' ', @missing ) if ( @missing );
 }
 
 sub _findcfg {
-  return $ENV{MCPANI_CONFIG} if(defined($ENV{MCPANI_CONFIG}) && -r $ENV{MCPANI_CONFIG});
-  return "$ENV{HOME}/.mcpani/config" if(defined($ENV{HOME}) && -r "$ENV{HOME}/.mcpani/config");
-  return '/usr/local/etc/mcpani' if(-r '/usr/local/etc/mcpani');
-  return '/etc/mcpani' if(-r '/etc/mcpani');
-  return undef; 
+  return $ENV{MCPANI_CONFIG}
+   if ( defined( $ENV{MCPANI_CONFIG} ) && -r $ENV{MCPANI_CONFIG} );
+  return "$ENV{HOME}/.mcpani/config"
+   if ( defined( $ENV{HOME} ) && -r "$ENV{HOME}/.mcpani/config" );
+  return '/usr/local/etc/mcpani' if ( -r '/usr/local/etc/mcpani' );
+  return '/etc/mcpani'           if ( -r '/etc/mcpani' );
+  return undef;
 }
 
 sub _authordir {
-  my ($self,$author,$dir)=@_;
+  my ( $self, $author, $dir ) = @_;
 
-  foreach my $subdir ('authors','id',substr($author,0,1),substr($author,0,2),$author) {
-    $dir.="/$subdir";
-    unless(-e $dir) {
+  foreach my $subdir (
+    'authors', 'id',
+    substr( $author, 0, 1 ),
+    substr( $author, 0, 2 ), $author
+   ) {
+    $dir .= "/$subdir";
+    unless ( -e $dir ) {
       mkdir $dir
-        or croak "mkdir $subdir failed: $!";
-      chmod(oct($self->_cfg('dirmode')),$dir) if($self->_cfg('dirmode'));
+       or croak "mkdir $subdir failed: $!";
+      chmod( oct( $self->_cfg( 'dirmode' ) ), $dir )
+       if ( $self->_cfg( 'dirmode' ) );
     }
   }
 
-  return substr($author,0,1).'/'.substr($author,0,2).'/'.$author;
+  return
+     substr( $author, 0, 1 ) . '/'
+   . substr( $author, 0, 2 ) . '/'
+   . $author;
 }
 
 sub _mkpath {
-  my $paths=shift;
-  my $mode=shift;
+  my $paths = shift;
+  my $mode  = shift;
 
-  foreach my $path (@$paths) {
+  foreach my $path ( @$paths ) {
     my $partpath;
-    foreach my $subdir (split("/",$path)) {
-      $partpath.=$subdir;
-      if(length($subdir) && not -e $partpath) {
+    foreach my $subdir ( split( "/", $path ) ) {
+      $partpath .= $subdir;
+      if ( length( $subdir ) && not -e $partpath ) {
         mkdir $partpath;
-        chmod($mode,$partpath) if($mode);
+        chmod( $mode, $partpath ) if ( $mode );
       }
-      $partpath.='/';
+      $partpath .= '/';
     }
   }
 }
 
 sub _fmtmodule {
-  my ($module,$file,$version)=@_;
+  my ( $module, $file, $version ) = @_;
 
-  $module.=' ' while(length($module)+length($version) < 38);
+  $module .= ' ' while ( length( $module ) + length( $version ) < 38 );
 
   return "$module $version  $file";
 }
 
-sub _cfg { 
-  $_[0]->{config}{$_[1]} 
+sub _cfg {
+  $_[0]->{config}{ $_[1] };
 }
 
 sub _readpkgs {
-  my $self=shift;
+  my $self = shift;
 
-  my $gzread = gzopen( $self->_cfg('local').
-                       '/modules/02packages.details.txt.gz',
-                       'rb') 
-    or croak "Cannot open local 02packages.details.txt.gz: $gzerrno";
+  my $gzread
+   = gzopen(
+    $self->_cfg( 'local' ) . '/modules/02packages.details.txt.gz',
+    'rb' )
+   or croak "Cannot open local 02packages.details.txt.gz: $gzerrno";
 
-  my $inheader=1;
+  my $inheader = 1;
   my @packages;
   my $package;
 
-  while($gzread->gzreadline($package)) {
-    if($inheader) {
-      $inheader=0 unless($package=~/\S/);
+  while ( $gzread->gzreadline( $package ) ) {
+    if ( $inheader ) {
+      $inheader = 0 unless ( $package =~ /\S/ );
       next;
     }
-    chomp($package);
-    push(@packages,$package);
+    chomp( $package );
+    push( @packages, $package );
   }
 
   $gzread->gzclose;
@@ -561,43 +595,52 @@ sub _readpkgs {
 }
 
 sub _writepkgs {
-  my $self=shift;
-  my $pkgs=shift;
+  my $self = shift;
+  my $pkgs = shift;
 
-  my $gzwrite = gzopen( $self->_cfg('local').
-                       '/modules/02packages.details.txt.gz',
-                       'wb') 
-    or croak "Can't open local 02packages.details.txt.gz for writing: $gzerrno";
+  my $gzwrite
+   = gzopen(
+    $self->_cfg( 'local' ) . '/modules/02packages.details.txt.gz',
+    'wb' )
+   or croak
+   "Can't open local 02packages.details.txt.gz for writing: $gzerrno";
 
-  $gzwrite->gzwrite("File:         02packages.details.txt\n");
-  $gzwrite->gzwrite("URL:          http://www.perl.com/CPAN/modules/02packages.details.txt\n");
-  $gzwrite->gzwrite('Description:  Package names found in directory $CPAN/authors/id/'."\n");
-  $gzwrite->gzwrite("Columns:      package name, version, path\n");
-  $gzwrite->gzwrite("Intended-For: Automated fetch routines, namespace documentation.\n");
-  $gzwrite->gzwrite("Written-By:   CPAN::Mini::Inject $VERSION\n");
-  $gzwrite->gzwrite("Line-Count:   ".scalar(@$pkgs)."\n");
-# Last-Updated: Sat, 19 Mar 2005 19:49:10 GMT
-  $gzwrite->gzwrite("Last-Updated: "._fmtdate()."\n\n");
+  $gzwrite->gzwrite( "File:         02packages.details.txt\n" );
+  $gzwrite->gzwrite(
+    "URL:          http://www.perl.com/CPAN/modules/02packages.details.txt\n"
+  );
+  $gzwrite->gzwrite(
+    'Description:  Package names found in directory $CPAN/authors/id/'
+     . "\n" );
+  $gzwrite->gzwrite( "Columns:      package name, version, path\n" );
+  $gzwrite->gzwrite(
+    "Intended-For: Automated fetch routines, namespace documentation.\n"
+  );
+  $gzwrite->gzwrite( "Written-By:   CPAN::Mini::Inject $VERSION\n" );
+  $gzwrite->gzwrite( "Line-Count:   " . scalar( @$pkgs ) . "\n" );
+  # Last-Updated: Sat, 19 Mar 2005 19:49:10 GMT
+  $gzwrite->gzwrite( "Last-Updated: " . _fmtdate() . "\n\n" );
 
-  $gzwrite->gzwrite("$_\n") for(@$pkgs);
+  $gzwrite->gzwrite( "$_\n" ) for ( @$pkgs );
 
   $gzwrite->gzclose;
 
 }
 
 sub _readauthors {
-  my $self=shift;
-  my $gzread = gzopen( $self->_cfg('local').
-                       '/authors/01mailrc.txt.gz',
-                       'rb') 
-    or croak "Cannot open ".$self->_cfg('local')."/authors/01mailrc.txt.gz: $gzerrno";
+  my $self = shift;
+  my $gzread
+   = gzopen( $self->_cfg( 'local' ) . '/authors/01mailrc.txt.gz', 'rb' )
+   or croak "Cannot open "
+   . $self->_cfg( 'local' )
+   . "/authors/01mailrc.txt.gz: $gzerrno";
 
   my @authors;
   my $author;
 
-  while($gzread->gzreadline($author)) {
-    chomp($author);
-    push(@authors,$author);
+  while ( $gzread->gzreadline( $author ) ) {
+    chomp( $author );
+    push( @authors, $author );
   }
 
   $gzread->gzclose;
@@ -606,32 +649,32 @@ sub _readauthors {
 }
 
 sub _writeauthors {
-  my $self=shift;
-  my $authors=shift;
+  my $self    = shift;
+  my $authors = shift;
 
-  my $gzwrite = gzopen( $self->_cfg('local').
-                       '/authors/01mailrc.txt.gz',
-                       'wb') 
-    or croak "Can't open local authors/01mailrc.txt.gz for writing: $gzerrno";
+  my $gzwrite
+   = gzopen( $self->_cfg( 'local' ) . '/authors/01mailrc.txt.gz', 'wb' )
+   or croak
+   "Can't open local authors/01mailrc.txt.gz for writing: $gzerrno";
 
-  $gzwrite->gzwrite("$_\n") for(sort @$authors);
+  $gzwrite->gzwrite( "$_\n" ) for ( sort @$authors );
 
   $gzwrite->gzclose;
 
 }
 
 sub _uniq {
-  my ($list1,$list2)=@_;
+  my ( $list1, $list2 ) = @_;
 
-  my %combined=map { $_, undef } @$list1,@$list2;
+  my %combined = map { $_, undef } @$list1, @$list2;
 
-  my @fulllist=sort(keys(%combined));
-# return \@{sort(keys(%combined))};
+  my @fulllist = sort( keys( %combined ) );
+  # return \@{sort(keys(%combined))};
   return \@fulllist;
 }
 
 sub _fmtdate {
-  my @date=split(/\s+/,scalar(gmtime())); 
+  my @date = split( /\s+/, scalar( gmtime() ) );
   return "$date[0], $date[2] $date[1] $date[4] $date[3] GMT";
 }
 
@@ -666,4 +709,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of CPAN::Mini::Inject
+1;    # End of CPAN::Mini::Inject

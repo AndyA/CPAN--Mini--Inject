@@ -6,74 +6,98 @@ use File::Copy;
 use File::Basename;
 use Compress::Zlib;
 
-rmtree( [ 't/local/MYCPAN/modulelist' ] ,0,1);
-copy('t/local/CPAN/modules/02packages.details.txt.gz.bak','t/local/CPAN/modules/02packages.details.txt.gz');
-rmtree( [ 't/local/CPAN/authors' ] ,0,1);
-mkdir('t/local/CPAN/authors');
-copy('t/local/01mailrc.txt.gz.bak','t/local/CPAN/authors/01mailrc.txt.gz');
-mkdir('t/local/MYCPAN');
+rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
+copy(
+  't/local/CPAN/modules/02packages.details.txt.gz.bak',
+  't/local/CPAN/modules/02packages.details.txt.gz'
+);
+rmtree( ['t/local/CPAN/authors'], 0, 1 );
+mkdir( 't/local/CPAN/authors' );
+copy(
+  't/local/01mailrc.txt.gz.bak',
+  't/local/CPAN/authors/01mailrc.txt.gz'
+);
+mkdir( 't/local/MYCPAN' );
 
 my $mcpi;
-my $module="S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
+my $module = "S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
 
-$mcpi=CPAN::Mini::Inject->new;
+$mcpi = CPAN::Mini::Inject->new;
 
 ## add two modules
-$mcpi->loadcfg('t/.mcpani/config')
-     ->parsecfg
-     ->readlist
-     ->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.01', file => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
-     ->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.02', file => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
-     ->writelist;
+$mcpi->loadcfg( 't/.mcpani/config' )->parsecfg->readlist->add(
+  module   => 'CPAN::Mini::Inject',
+  authorid => 'SSORICHE',
+  version  => '0.01',
+  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+ )->add(
+  module   => 'CPAN::Mini::Inject',
+  authorid => 'SSORICHE',
+  version  => '0.02',
+  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+ )->writelist;
 
-ok($mcpi->inject,'Copy modules');
-ok(-e "t/local/CPAN/authors/id/$module",'Module file exists');
-ok(-e 't/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS','Checksum created');
+ok( $mcpi->inject,                        'Copy modules' );
+ok( -e "t/local/CPAN/authors/id/$module", 'Module file exists' );
+ok( -e 't/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS',
+  'Checksum created' );
 
 SKIP: {
-  skip "Not a UNIX system", 3 if($^O =~ /^MSWin/);
-  is((stat("t/local/CPAN/authors/id/$module"))[2] & 07777,0664,'Module file mode set');
-  is((stat(dirname("t/local/CPAN/authors/id/$module")))[2] & 07777,0775,'Author directory mode set');
-  is((stat('t/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS'))[2] & 07777,0664,'Checksum file mode set');
+  skip "Not a UNIX system", 3 if ( $^O =~ /^MSWin/ );
+  is( ( stat( "t/local/CPAN/authors/id/$module" ) )[2] & 07777,
+    0664, 'Module file mode set' );
+  is(
+    ( stat( dirname( "t/local/CPAN/authors/id/$module" ) ) )[2] & 07777,
+    0775,
+    'Author directory mode set'
+  );
+  is(
+    ( stat( 't/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS' ) )[2]
+     & 07777,
+    0664,
+    'Checksum file mode set'
+  );
 }
 
-my @goodfile=<DATA>;
-ok(my $gzread=gzopen( 't/local/CPAN/modules/02packages.details.txt.gz', 'rb')); 
+my @goodfile = <DATA>;
+ok( my $gzread
+   = gzopen( 't/local/CPAN/modules/02packages.details.txt.gz', 'rb' ) );
 
 my @packages;
 my $package;
-while($gzread->gzreadline($package)) {
-  if($package=~/^Written-By:/) {
-    push(@packages,"Written-By:\n");
+while ( $gzread->gzreadline( $package ) ) {
+  if ( $package =~ /^Written-By:/ ) {
+    push( @packages, "Written-By:\n" );
     next;
   }
-  if($package=~/^Last-Updated:/) {
-    push(@packages,"Last-Updated:\n");
+  if ( $package =~ /^Last-Updated:/ ) {
+    push( @packages, "Last-Updated:\n" );
     next;
   }
-  push(@packages,$package);
+  push( @packages, $package );
 }
 
-is_deeply(\@goodfile,\@packages);
+is_deeply( \@goodfile, \@packages );
 
-ok(my $gzauthread=gzopen( 't/local/CPAN/authors/01mailrc.txt.gz', 'rb'));
+ok( my $gzauthread
+   = gzopen( 't/local/CPAN/authors/01mailrc.txt.gz', 'rb' ) );
 
 my $author;
 my $author_was_injected = 0;
-while($gzauthread->gzreadline($author)) {
-    if( $author =~ /SSORICHE/ ) {
-        $author_was_injected++;
-    }
+while ( $gzauthread->gzreadline( $author ) ) {
+  if ( $author =~ /SSORICHE/ ) {
+    $author_was_injected++;
+  }
 }
-ok($author_was_injected,'author injected into 01mailrc.txt.gz');
-ok($author_was_injected == 1,'author injected exactly 1 time');
+ok( $author_was_injected,      'author injected into 01mailrc.txt.gz' );
+ok( $author_was_injected == 1, 'author injected exactly 1 time' );
 
-unlink('t/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS');
-unlink("t/local/CPAN/authors/id/$module");
-unlink('t/local/MYCPAN/modulelist');
-unlink('t/local/CPAN/modules/02packages.details.txt.gz');
+unlink( 't/local/CPAN/authors/id/S/SS/SSORICHE/CHECKSUMS' );
+unlink( "t/local/CPAN/authors/id/$module" );
+unlink( 't/local/MYCPAN/modulelist' );
+unlink( 't/local/CPAN/modules/02packages.details.txt.gz' );
 
-rmtree( [ 't/local/CPAN/authors','t/local/MYCPAN' ] ,0,1);
+rmtree( [ 't/local/CPAN/authors', 't/local/MYCPAN' ], 0, 1 );
 
 __DATA__
 File:         02packages.details.txt

@@ -13,80 +13,113 @@ use Env;
 use lib 't/lib';
 
 sub chkcfg {
-  return 1 if(-r '/usr/local/etc/mcpani');
-  return 1 if(-r '/etc/mcpani');
+  return 1 if ( -r '/usr/local/etc/mcpani' );
+  return 1 if ( -r '/etc/mcpani' );
 }
 
 my $prevhome;
-if(defined($ENV{HOME})) {
-  $prevhome=$ENV{HOME};
+if ( defined( $ENV{HOME} ) ) {
+  $prevhome = $ENV{HOME};
   delete $ENV{HOME};
 }
 
 my $mcpanienv;
-if(defined($ENV{MCPANI_CONFIG})) {
-  $mcpanienv=$ENV{MCPANI_CONFIG};
+if ( defined( $ENV{MCPANI_CONFIG} ) ) {
+  $mcpanienv = $ENV{MCPANI_CONFIG};
   delete $ENV{MCPANI_CONFIG};
 }
 
-my $mcpi=CPAN::Mini::Inject->new;
+my $mcpi = CPAN::Mini::Inject->new;
 # loadcfg()
 SKIP: {
-  skip 'Config file exists', 1 if(chkcfg());
-  dies_ok {$mcpi->loadcfg} 'No config file';
+  skip 'Config file exists', 1 if ( chkcfg() );
+  dies_ok { $mcpi->loadcfg } 'No config file';
 }
 
 # parsecfg()
-dies_ok { $mcpi->parsecfg('t/.mcpani/config_bad'); } 'Missing config option';
+dies_ok { $mcpi->parsecfg( 't/.mcpani/config_bad' ); }
+'Missing config option';
 
 # readlist()
 SKIP: {
   skip 'User is superuser and can always read', 1 if $< == 0;
 
-  rmtree( [ 't/local/MYCPAN/modulelist' ],0,1);
+  rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
   mkdir 't/local/MYCPAN';
-  $mcpi->parsecfg('t/.mcpani/config_noread');
+  $mcpi->parsecfg( 't/.mcpani/config_noread' );
   dies_ok { $mcpi->readlist } 'unreadable file';
-  rmtree( [ 't/local/MYCPAN/modulelist' ],0,1);
+  rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
 }
 
-$mcpi->parsecfg('t/.mcpani/config');
+$mcpi->parsecfg( 't/.mcpani/config' );
 
 # add()
-dies_ok { $mcpi->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.01' ) } 'Missing add param';
-dies_ok { $mcpi->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.01', file => 'blahblah' ) } 'Module file not readable';
+dies_ok {
+  $mcpi->add(
+    module   => 'CPAN::Mini::Inject',
+    authorid => 'SSORICHE',
+    version  => '0.01'
+  );
+}
+'Missing add param';
+dies_ok {
+  $mcpi->add(
+    module   => 'CPAN::Mini::Inject',
+    authorid => 'SSORICHE',
+    version  => '0.01',
+    file     => 'blahblah'
+  );
+}
+'Module file not readable';
 
-$mcpi->parsecfg('t/.mcpani/config_norepo');
+$mcpi->parsecfg( 't/.mcpani/config_norepo' );
 
-dies_ok { $mcpi->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.01', file => 'test-0.01.tar.gz' ) } 'Missing config repository';
+dies_ok {
+  $mcpi->add(
+    module   => 'CPAN::Mini::Inject',
+    authorid => 'SSORICHE',
+    version  => '0.01',
+    file     => 'test-0.01.tar.gz'
+  );
+}
+'Missing config repository';
 
-$mcpi->parsecfg('t/.mcpani/config_read');
+$mcpi->parsecfg( 't/.mcpani/config_read' );
 
-dies_ok { $mcpi->add( module => 'CPAN::Mini::Inject', authorid => 'SSORICHE', version => '0.01', file => 'test-0.01.tar.gz' ) } 'read-only repository';
+dies_ok {
+  $mcpi->add(
+    module   => 'CPAN::Mini::Inject',
+    authorid => 'SSORICHE',
+    version  => '0.01',
+    file     => 'test-0.01.tar.gz'
+  );
+}
+'read-only repository';
 
 # writelist()
 SKIP: {
   skip 'User is superuser and can always write', 1 if $< == 0;
 
-  rmtree( [ 't/local/MYCPAN/modulelist' ],0,1);
+  rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
   mkdir 't/local/MYCPAN';
-  $mcpi->parsecfg('t/.mcpani/config_nowrite');
+  $mcpi->parsecfg( 't/.mcpani/config_nowrite' );
   dies_ok { $mcpi->writelist } 'fail write file';
-  rmtree( [ 't/local/MYCPAN/modulelist' ],0,1);
+  rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
 }
 
-$mcpi->{config}{remote}="ftp://blahblah http://blah blah";
+$mcpi->{config}{remote} = "ftp://blahblah http://blah blah";
 dies_ok { $mcpi->testremote } 'No reachable site';
 
 # Setup routines
 sub genmodlist {
-  open(MODLIST,'>t/local/MYCPAN/modulelist') or die "Can not create t/local/MYCPAN/modulelist: $!";
+  open( MODLIST, '>t/local/MYCPAN/modulelist' )
+   or die "Can not create t/local/MYCPAN/modulelist: $!";
   print MODLIST << "EOF"
 CPAN::Checksums                   1.016  A/AN/ANDK/CPAN-Checksums-1.016.tar.gz
 CPAN::Mini                         0.18  R/RJ/RJBS/CPAN-Mini-0.18.tar.gz
 CPANPLUS                         0.0499  A/AU/AUTRIJUS/CPANPLUS-0.0499.tar.gz
 EOF
-; 
-  close(MODLIST);
+   ;
+  close( MODLIST );
 }
 
