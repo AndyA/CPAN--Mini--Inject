@@ -21,7 +21,7 @@ Version 0.23
 
 =cut
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
@@ -249,10 +249,12 @@ sub update_mirror {
 
 =head2 add()
 
-Add a new module to the repository. The add method copies the module file
-into the repository with the same structure as a CPAN site. For example
-CPAN-Mini-Inject-0.01.tar.gz is copied to MYCPAN/authors/id/S/SS/SSORICHE.
-add creates the required directory structure below the repository.
+Add a new module to the repository. The add method copies the module
+file into the repository with the same structure as a CPAN site. For
+example CPAN-Mini-Inject-0.01.tar.gz is copied to
+MYCPAN/authors/id/S/SS/SSORICHE. add creates the required directory
+structure below the repository.
+
 
 =over 4
 
@@ -682,9 +684,11 @@ sub _fmtdate {
 
 L<CPAN::Mini>
 
-L<<a href="http://github.com/ssoriche/cpan--mini--inject/tree/master">Source Repository</a>>
+=head1 Maintainer
 
-=head1 Author
+Andy Armstrong, C<< <andy@hexten.net> >>
+
+=head1 Original Author
 
 Shawn Sorichetti, C<< <ssoriche@cpan.org> >>
 
@@ -702,7 +706,7 @@ be notified of progress on your bug as I make changes.
 
 =head1 Copyright & License
 
-Copyright 2008 Shawn Sorichetti, All Rights Reserved.
+Copyright 2008-2009 Shawn Sorichetti, Andy Armstrong, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
