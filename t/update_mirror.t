@@ -21,6 +21,7 @@ rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
 my $server = CPANServer->new( 11027 );
 my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
+sleep 1;
 
 $SIG{__DIE__} = sub { kill( 9, $pid ) };
 

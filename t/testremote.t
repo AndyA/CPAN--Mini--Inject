@@ -14,6 +14,8 @@ BEGIN {
 my $server = CPANServer->new( 11027 );
 my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
+# Give server time to get going.
+sleep 1;
 
 $SIG{__DIE__} = sub { kill( 9, $pid ) };
 

@@ -6,6 +6,7 @@ lib/CPAN/Mini/Inject.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+META.yml
 README
 t/.mcpani/config
 t/.mcpani/config_bad
@@ -26,6 +27,8 @@ t/html/index.html
 t/inject.t
 t/lib/CPANServer.pm
 t/loadcfg.t
+t/local/01mailrc.txt.gz.bak
+t/local/CPAN/modules/02packages.details.txt.gz.bak
 t/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz
 t/new.t
 t/parsecfg.t

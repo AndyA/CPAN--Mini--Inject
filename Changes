@@ -1,16 +1,21 @@
 Revision history for CPAN-Mini-Inject
 
-0.23 - Sat Oct 25 09:54:45 2008
-	Rebundled to remove OS X extended attributes that were causing tests to fail.
+0.24    2009/05/10
+        - Made tests use a port (11027) other than 8080 to avoid clashes
+          with existing services.
 
-0.22    06/25/2008
+0.23    2008/10/25
+        - Rebundled to remove OS X extended attributes that were causing
+          tests to fail.
+
+0.22    2008/06/25
         - fixed a bug where authors were being added
           more than once to 01mailrc.txt.gz
 
-0.21    06/25/2008
+0.21    2008/06/25
         - changes for RT bug 17386 by: David Bartle
 
-0.20    06/25/2008
+0.20    2008/06/25
         - added a command line option '--all-in-meta' which will
           parse the META.yml and index every module listed in the
           'provides' section
@@ -18,24 +23,24 @@ Revision history for CPAN-Mini-Inject
           filename if relative or absolute paths are specified
         - changes for RT bug 37093 by: David Bartle
 
-0.18.1  06/25/2008
+0.18.1  2008/06/25
         - Fixed bug number 28363
           http://rt.cpan.org/Ticket/Display.html?id=28363
 
-0.18    04/02/2005
+0.18    2005/04/02
         - Fixed bug number 11718 involving the Line-Count in 
           02packages.details.txt.gz not being updated.
         - Added tests for update_mirror method.
         - Migrated tests to HTTP::Server::Simple.
 
-0.16    01/08/2005
+0.16    2005/01/08
         - Decreased the size of t/read/authors/01mailrc.txt.gz reducing
           greatly the size of the package.
         - More problems discovered with exception testing. Moved all
           exception tests to a single zz.exceptions.t, skip them all
           if Test::Exception isn't installed.
 
-0.14    01/05/2005
+0.14    2005/01/05
         - Added an optional filename parameter to parsecfg. This allows
           calling parsecfg without having to previously call loadcfg
           (tests added as required).
@@ -48,18 +53,18 @@ Revision history for CPAN-Mini-Inject
           fixing a problem with CPAN::Mini::Inject and the latest version
           of CPAN::Mini (0.32).
 
-0.12    01/04/2005
+0.12    2005/01/04
         - Tests failed for inject and add on Windows systems. These tests
           have now been skipped.
         - Reverted all tests to use eval{}. Using eval "" caused problems
           on Windows, while eval{} only caused problems on one AIX box.
 
-0.10    12/30/2004
+0.10    2004/12/30
         - Fixed dirmode in inject(), add(), writelist(), so that all files
           created are set with the correct permissions.
         - Added tests for directory and file modes.
 
-0.08    12/08/2004
+0.08    2004/12/08
         - Tests were found to fail on AIX which contained eval{}, all
           tests updated with eval "".
         - Added a default value for dirmode in update_mirror based on
@@ -70,13 +75,13 @@ Revision history for CPAN-Mini-Inject
         - Add a prereq for CPAN::Mini version 0.24. This version contains
           a bugfix to properly handle dirmode. (Thanks RJBS).
 
-0.06    11/10/2004
+0.06    2004/11/10
 
         - mcpani now parses the file passed to it to determine module name
           and version. Command line options override the parsing.
         - loadcfg() croaks if no configuration file is found.
 
-0.04    11/05/2004
+0.04    2004/11/05
 
         - t/readlist.t and t/writelist.t both skip failure tests if
           the uid is 0.
@@ -88,6 +93,6 @@ Revision history for CPAN-Mini-Inject
         - Minor updates to perldoc in mcpani
         - Added CPAN::Mini as a required module to Makefile.PL
 
-0.02    10/31/2004
+0.02    2004/10/31
         - First version, released on an unsuspecting world.
 

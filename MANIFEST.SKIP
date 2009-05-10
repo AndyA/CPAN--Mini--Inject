@@ -27,7 +27,10 @@
 \.old$
 \#$
 \b\.#
-\.bak$
+#\.bak$
 
 # Avoid Devel::Cover files.
 \bcover_db\b
+
+^CPAN-Mini-Inject-
+^Session\.vim$
