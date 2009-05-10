@@ -1,0 +1,13 @@
+- Add logging to a file all the updates that are occuring (verbose mode
+  to a file).
+
+- Add a method to remove packages from the repository
+
+- Add testing for verbose modes (check STDOUT to make sure the output is
+correct).
+
+- Think about adding a simple HTTP::Server::Simple to serve CPAN.
+
+- Add plugins via Module::Pluggable if it's available
+
+- Migrate mirroring functions from CPAN::Mini into CPAN::Mini::Inject removing the requirement for CPAN::Mini.

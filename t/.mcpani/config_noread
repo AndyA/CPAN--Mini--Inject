@@ -1,0 +1,3 @@
+local: t/local/CPAN
+remote : http://www.cpan.org
+repository: t/local/WRITEREPO

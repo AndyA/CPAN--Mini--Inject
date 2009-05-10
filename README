@@ -1,0 +1,6 @@
+README for CPAN::Mini::Inject
+
+CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
+then adds modules from your repository to it. Allowing the inclusion
+of private modules in a minimal CPAN mirror. This enables the use of 
+CPAN/CPANPLUS to install them.

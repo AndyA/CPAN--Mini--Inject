@@ -1,0 +1,5 @@
+# This file is missing a local setting.
+remote : http://www.cpan.org
+repository: t/local/MYCPAN
+passive: yes
+This line will be ignored

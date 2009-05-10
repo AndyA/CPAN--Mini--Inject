@@ -1,0 +1,3 @@
+remote: http://www.cpan.org   http://localhost
+local: t/local/CPAN
+repository: t/read/MYCPAN
