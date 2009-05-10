@@ -1,5 +1,5 @@
 local: t/local/CPAN
-remote : http://blahblah http://localhost:8080
+remote : http://blahblah http://localhost:11027
 repository: t/local/MYCPAN
 dirmode: 0775
 passive: yes

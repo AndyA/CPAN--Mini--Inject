@@ -18,7 +18,7 @@ use File::Path;
 
 rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
 
-my $server = CPANServer->new;
+my $server = CPANServer->new( 11027 );
 my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
 
@@ -30,7 +30,7 @@ $mcpi->parsecfg( 't/.mcpani/config' );
 mkdir( catdir( 't', 'mirror' ) );
 
 $mcpi->update_mirror(
-  remote => 'http://localhost:8080',
+  remote => 'http://localhost:11027',
   local  => catdir( 't', 'mirror' )
 );
 

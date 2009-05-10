@@ -11,7 +11,7 @@ BEGIN {
   plan tests => 3;
 }
 
-my $server = CPANServer->new;
+my $server = CPANServer->new( 11027 );
 my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
 
@@ -21,12 +21,12 @@ my $mcpi = CPAN::Mini::Inject->new;
 $mcpi->loadcfg( 't/.mcpani/config' )->parsecfg;
 
 $mcpi->testremote;
-is( $mcpi->{site}, 'http://localhost:8080/', 'Correct remote URL' );
+is( $mcpi->{site}, 'http://localhost:11027/', 'Correct remote URL' );
 
 $mcpi->loadcfg( 't/.mcpani/config_badremote' )->parsecfg;
 
 $mcpi->testremote;
-is( $mcpi->{site}, 'http://localhost:8080/',
+is( $mcpi->{site}, 'http://localhost:11027/',
   'Selects correct remote URL' );
 
 kill( 9, $pid );
