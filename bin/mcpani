@@ -3,181 +3,190 @@
 use strict;
 use Pod::Usage 1.12;
 use Getopt::Long;
-use YAML qw( Load ); 
+use YAML qw( Load );
 use Archive::Tar;
 use CPAN::Mini::Inject;
 use Env;
 
 our $VERSION = '0.25';
-our %options=();
+our %options = ();
 
 sub print_version {
-  printf("mcpani v%s, using CPAN::Mini::Inject v%s and Perl v%vd\n", $VERSION, $CPAN::Mini::Inject::VERSION, $^V);
+  printf( "mcpani v%s, using CPAN::Mini::Inject v%s and Perl v%vd\n",
+    $VERSION, $CPAN::Mini::Inject::VERSION, $^V );
 }
 
 sub chkactions {
-  foreach my $action (qw(add update mirror inject)) {
-    return 1 if($options{actionname} eq $action)
+  foreach my $action ( qw(add update mirror inject) ) {
+    return 1 if ( $options{actionname} eq $action );
   }
   return 0;
 }
 
 sub setsub {
-  $options{actionname}=shift;
-  $options{action}=shift;
+  $options{actionname} = shift;
+  $options{action}     = shift;
 }
 
 sub add {
-  my $mcpi=shift;
+  my $mcpi = shift;
 
-  if($options{file}=~/([^\/]*)-([0-9._]+)\.tar\.gz$/) {
-      $options{module}||=$1;
-      $options{version}||=$2;
+  if ( $options{file} =~ /([^\/]*)-([0-9._]+)\.tar\.gz$/ ) {
+    $options{module}  ||= $1;
+    $options{version} ||= $2;
 
-      $options{module}=~s/-/::/g;
+    $options{module} =~ s/-/::/g;
   }
 
   $mcpi->readlist;
 
-
   my @modules_to_add;
-  if( $options{'all-in-meta'} ) {
+  if ( $options{'all-in-meta'} ) {
     ## attempt to read the META.yml
     my $meta_data = _load_meta( $options{file} );
 
-    my $provides  = $meta_data->{provides} || {};
+    my $provides = $meta_data->{provides} || {};
 
-    if( !$provides ) {
-        warn("Could not find the 'provides' section in META.yml. "
-           . "Only adding based on provided command line.\n");
+    if ( !$provides ) {
+      warn("Could not find the 'provides' section in META.yml. "
+         . "Only adding based on provided command line.\n" );
     }
 
     PROVIDE_ENTRY:
-    while ( my($name,$info) = each( %{ $provides } ) ) {
-        next PROVIDE_ENTRY if $name eq $options{module};
-        my $v = defined $info->{version} ?  $info->{version}
-              :                             'undef';
+    while ( my ( $name, $info ) = each( %{$provides} ) ) {
+      next PROVIDE_ENTRY if $name eq $options{module};
+      my $v
+       = defined $info->{version}
+       ? $info->{version}
+       : 'undef';
 
-        push @modules_to_add, {
-            version => $v,
-            module  => $name
-        };
+      push @modules_to_add,
+       {
+        version => $v,
+        module  => $name
+       };
     }
 
   }
 
   # always add the module/version provided on the command line
   # as well
-  push @modules_to_add, {
-      version => $options{version},
-      module  => $options{module},
-  };
+  push @modules_to_add,
+   {
+    version => $options{version},
+    module  => $options{module},
+   };
 
   $mcpi->readlist;
   foreach my $item ( @modules_to_add ) {
-    $mcpi->add( module => $item->{module},
-              authorid => $options{authorid},
-              version => $item->{version},
-              file => $options{file} );
+    $mcpi->add(
+      module   => $item->{module},
+      authorid => $options{authorid},
+      version  => $item->{version},
+      file     => $options{file}
+    );
 
-    if($options{verbose}) {
-        print "\nAdding module: $item->{module}\n";
-        print "Author ID: $options{authorid}\n";
-        print "Version: $item->{version}\n";
-        print "File: $options{file}\n";
-        print "To repository: $mcpi->{config}{repository}\n\n";
+    if ( $options{verbose} ) {
+      print "\nAdding module: $item->{module}\n";
+      print "Author ID: $options{authorid}\n";
+      print "Version: $item->{version}\n";
+      print "File: $options{file}\n";
+      print "To repository: $mcpi->{config}{repository}\n\n";
     }
   }
   $mcpi->writelist;
 
-
 }
 
 sub update {
-  my $mcpi=shift;
+  my $mcpi = shift;
 
-  mirror($mcpi);
-  inject($mcpi);
+  mirror( $mcpi );
+  inject( $mcpi );
 }
 
 sub mirror {
-  my $mcpi=shift;
+  my $mcpi = shift;
   my %mirroropts;
 
-  $mirroropts{remote}=$options{remote} if(defined($options{remote}));
-  $mirroropts{local}=$options{local} if(defined($options{local}));
-  $mirroropts{trace}=$options{verbose} if(defined($options{verbose}));
+  $mirroropts{remote} = $options{remote}
+   if ( defined( $options{remote} ) );
+  $mirroropts{local} = $options{local}
+   if ( defined( $options{local} ) );
+  $mirroropts{trace} = $options{verbose}
+   if ( defined( $options{verbose} ) );
 
   $mcpi->update_mirror( %mirroropts );
 }
 
 sub inject {
-  my $mcpi=shift;
+  my $mcpi = shift;
 
-  print "Injecting modules from $mcpi->{config}{repository}\n" if($options{verbose});
-  $mcpi->inject($options{verbose});
+  print "Injecting modules from $mcpi->{config}{repository}\n"
+   if ( $options{verbose} );
+  $mcpi->inject( $options{verbose} );
 }
 
 sub _load_meta {
   my $filename = shift;
 
-  print "Loading META.yml from $options{file}\n" if($options{verbose});
+  print "Loading META.yml from $options{file}\n"
+   if ( $options{verbose} );
   my $tar = Archive::Tar->new();
-  $tar->read($filename);
-  
+  $tar->read( $filename );
+
   my $meta_filename;
-  
+
   FILE_LIST:
   foreach my $name ( $tar->list_files() ) {
-      if( $name =~ /META\.yml$/ ) {
-          $meta_filename = $name;
-          last FILE_LIST;
-      }
+    if ( $name =~ /META\.yml$/ ) {
+      $meta_filename = $name;
+      last FILE_LIST;
+    }
   }
-  
-  if($meta_filename) {
-      return Load( $tar->get_content( $meta_filename ) );
+
+  if ( $meta_filename ) {
+    return Load( $tar->get_content( $meta_filename ) );
   }
-  
-  warn("Could not load the META.yml from file $options{file}");
+
+  warn( "Could not load the META.yml from file $options{file}" );
   return {};
 
 }
 
 # MAIN
-Getopt::Long::Configure('no_ignore_case');
-Getopt::Long::Configure('bundling');
+Getopt::Long::Configure( 'no_ignore_case' );
+Getopt::Long::Configure( 'bundling' );
 
 GetOptions(
-    'h|help|?'      => sub {pod2usage({-verbose => 1, -input => \*DATA}); exit},
-    'H|man'         => sub {pod2usage({-verbose => 2, -input => \*DATA}); exit},
-    'V|version'     => sub { print_version(); exit; },
-    'v|verbose'     => \$options{verbose},
-    'l|local=s'     => \$options{local},
-    'r|remote=s'    => \$options{remote},
-    'p|passive'     => \$ENV{FTP_PASSIVE},
-    'add'           => sub { setsub('add',\&add) },
-    'update'        => sub { setsub('update',\&update) },
-    'mirror'        => sub { setsub('mirror',\&mirror) },
-    'inject'        => sub { setsub('inject',\&inject) },
-    'module=s'      => \$options{module},
-    'authorid=s'    => \$options{authorid},
-    'modversion=s'  => \$options{version},
-    'file=s'        => \$options{file},
-    'all-in-meta'   => \$options{'all-in-meta'},
-  ) or exit 1;
+  'h|help|?' =>
+   sub { pod2usage( { -verbose => 1, -input => \*DATA } ); exit },
+  'H|man' =>
+   sub { pod2usage( { -verbose => 2, -input => \*DATA } ); exit },
+  'V|version' => sub { print_version(); exit; },
+  'v|verbose' => \$options{verbose},
+  'l|local=s' => \$options{local},
+  'r|remote=s'   => \$options{remote},
+  'p|passive'    => \$ENV{FTP_PASSIVE},
+  'add'          => sub { setsub( 'add', \&add ) },
+  'update'       => sub { setsub( 'update', \&update ) },
+  'mirror'       => sub { setsub( 'mirror', \&mirror ) },
+  'inject'       => sub { setsub( 'inject', \&inject ) },
+  'module=s'     => \$options{module},
+  'authorid=s'   => \$options{authorid},
+  'modversion=s' => \$options{version},
+  'file=s'       => \$options{file},
+  'all-in-meta'  => \$options{'all-in-meta'},
+) or exit 1;
 
-
-unless(defined($options{action}) && chkactions()) {
-  pod2usage({-verbose => 1, -input => \*DATA});
+unless ( defined( $options{action} ) && chkactions() ) {
+  pod2usage( { -verbose => 1, -input => \*DATA } );
   exit;
 }
 
-my $mcpi=CPAN::Mini::Inject->new 
-                           ->loadcfg($options{cfg})
-                           ->parsecfg;
+my $mcpi = CPAN::Mini::Inject->new->loadcfg( $options{cfg} )->parsecfg;
 
-&{$options{action}}($mcpi);
+&{ $options{action} }( $mcpi );
 
 __END__
 
