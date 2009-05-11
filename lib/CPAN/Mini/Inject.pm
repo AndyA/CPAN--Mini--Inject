@@ -2,14 +2,16 @@ package CPAN::Mini::Inject;
 
 use strict;
 
-use Env;
-use Carp;
-use LWP::Simple;
-use File::Copy;
-use File::Basename;
-use CPAN::Checksums qw(updatedir);
-use Compress::Zlib;
+use CPAN::Checksums qw( updatedir );
 use CPAN::Mini;
+use Carp;
+use Compress::Zlib;
+use Env;
+use File::Basename;
+use File::Copy;
+use File::Path qw( make_path );
+use File::Spec;
+use LWP::Simple;
 
 =head1 NAME
 
@@ -26,8 +28,8 @@ our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
 
-If you're not going to customize the way CPAN::Mini::Inject works, you
-probably want to look at the mcpani command, instead.
+If you're not going to customize the way CPAN::Mini::Inject works you
+probably want to look at the mcpani command instead.
 
     use CPAN::Mini::Inject;
 
@@ -58,6 +60,10 @@ allows method chaining. For example:
     $mcpi->pasrsecfg
          ->update_mirror
          ->inject;
+
+A C<CPAN::Mini::Inject> ISA L<CPAN::Mini>. Refer to the
+L<documentation|CPAN::Mini> for that module for details of the interface
+C<CPAN::Mini::Inject> inherits from it.
 
 =head2 new()
 
@@ -201,7 +207,7 @@ sub testremote {
 
   $ENV{FTP_PASSIVE} = 1 if ( $self->_cfg( 'passive' ) );
 
-  foreach my $site ( split( /\s+/, $self->_cfg( 'remote' ) ) ) {
+  for my $site ( split( /\s+/, $self->_cfg( 'remote' ) ) ) {
     $site .= '/' unless ( $site =~ m/\/$/ );
 
     print "Testing site: $site\n" if ( $verbose );
@@ -314,7 +320,7 @@ sub add {
    . basename( $options{file} );
 
   copy( $options{file}, dirname( $target ) )
-   or croak "Copy failed: $!";
+   or croak "Copy failed: $! $target";
 
   $self->_updperms( $target );
 
@@ -344,27 +350,28 @@ sub inject {
   my $self    = shift;
   my $verbose = shift;
 
-  my $dirmode = oct( $self->_cfg( 'dirmode' ) )
-   if ( $self->_cfg( 'dirmode' ) );
+  my $dm = $self->_cfg( 'dirmode' );
+  my $dirmode = defined $dm ? oct $dm : undef;
   $self->readlist unless ( exists( $self->{modulelist} ) );
 
   my %updatedir;
-  foreach my $modline ( @{ $self->{modulelist} } ) {
+  for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
     my $target = $self->_cfg( 'local' ) . '/authors/id/' . $file;
     my $source = $self->_cfg( 'repository' ) . '/authors/id/' . $file;
 
     $updatedir{ dirname( $file ) } = 1;
 
-    _mkpath( [ dirname( $target ) ], $dirmode );
-    copy( $source, dirname( $target ) )
-     or croak "Copy $source to " . dirname( $target ) . " failed: $!";
+    my $tdir = dirname $target;
+    _make_path( $tdir, defined $dirmode ? { mode => $dirmode } : {} );
+    copy( $source, $tdir )
+     or croak "Copy $source to $tdir failed: $!";
 
     $self->_updperms( $target );
     print "$target ... injected\n" if ( $verbose );
   }
 
-  foreach my $dir ( keys( %updatedir ) ) {
+  for my $dir ( keys( %updatedir ) ) {
     my $authdir = $self->_cfg( 'local' ) . "/authors/id/$dir";
     updatedir( $authdir );
     $self->_updperms( "$authdir/CHECKSUMS" );
@@ -415,7 +422,7 @@ sub updauthors {
   my @authors;
   my %authors_added;
   AUTHOR:
-  foreach my $modline ( @{ $self->{modulelist} } ) {
+  for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
     my $author
      = ( split( "/", $file, 4 ) )[2]; # extract the author from the path
@@ -439,24 +446,26 @@ Load the repository's modulelist.
 
 =cut
 
+sub _repo_file {
+  File::Spec->catfile( shift->_cfg( 'repository' ), @_ );
+}
+
+sub _modulelist { shift->_repo_file( 'modulelist' ) }
+
 sub readlist {
   my $self = shift;
 
   $self->{modulelist} = undef;
 
-  return $self
-   unless ( -e $self->_cfg( 'repository' ) . '/modulelist' );
-  croak 'Can not read module list: '
-   . $self->_cfg( 'repository' )
-   . '/modulelist'
-   unless ( -r $self->_cfg( 'repository' ) . '/modulelist' );
+  my $ml = $self->_modulelist;
+  return $self unless ( -e $ml );
 
-  open( MODLIST, $self->_cfg( 'repository' ) . '/modulelist' );
+  open MODLIST, '<', $ml or croak "Can not read module list: $ml ($!)";
   while ( <MODLIST> ) {
     chomp;
-    push( @{ $self->{modulelist} }, $_ );
+    push @{ $self->{modulelist} }, $_;
   }
-  close( MODLIST );
+  close MODLIST;
 
   return $self;
 }
@@ -492,70 +501,62 @@ sub writelist {
 sub _updperms {
   my ( $self, $file ) = @_;
 
-  chmod( oct( $self->_cfg( 'dirmode' ) ) & 06666, $file )
-   if ( $self->_cfg( 'dirmode' ) );
+  chmod oct( $self->_cfg( 'dirmode' ) ) & 06666, $file
+   if $self->_cfg( 'dirmode' );
 }
 
 sub _optionchk {
   my ( $options, @list ) = @_;
   my @missing;
 
-  foreach my $option ( @list ) {
-    push( @missing, $option ) unless ( defined( $$options{$option} ) );
+  for my $option ( @list ) {
+    push @missing, $option
+     unless ( defined $$options{$option} );
   }
 
-  return join( ' ', @missing ) if ( @missing );
+  return join ' ', @missing;
 }
 
 sub _findcfg {
-  return $ENV{MCPANI_CONFIG}
-   if ( defined( $ENV{MCPANI_CONFIG} ) && -r $ENV{MCPANI_CONFIG} );
-  return "$ENV{HOME}/.mcpani/config"
-   if ( defined( $ENV{HOME} ) && -r "$ENV{HOME}/.mcpani/config" );
-  return '/usr/local/etc/mcpani' if ( -r '/usr/local/etc/mcpani' );
-  return '/etc/mcpani'           if ( -r '/etc/mcpani' );
+  my @try = (
+    ( defined $ENV{MCPANI_CONFIG} ? ( [ $ENV{MCPANI_CONFIG} ] ) : () ),
+    (
+      defined $ENV{HOME} ? ( [ $ENV{HOME}, '.mcpani', 'config' ] ) : ()
+    ),
+  );
+  push @try, ['/usr/local/etc/mcpani'], ['/etc/mcpani']
+   unless $^O =~ /MSWin32/;
+  for my $try ( @try ) {
+    my $file = File::Spec->catfile( @$try );
+    return $file if -r $file;
+  }
   return undef;
+}
+
+sub _make_path {
+  my $um = umask 0;
+  make_path( @_ );
+  umask $um;
 }
 
 sub _authordir {
   my ( $self, $author, $dir ) = @_;
 
-  foreach my $subdir (
-    'authors', 'id',
-    substr( $author, 0, 1 ),
-    substr( $author, 0, 2 ), $author
-   ) {
-    $dir .= "/$subdir";
-    unless ( -e $dir ) {
-      mkdir $dir
-       or croak "mkdir $subdir failed: $!";
-      chmod( oct( $self->_cfg( 'dirmode' ) ), $dir )
-       if ( $self->_cfg( 'dirmode' ) );
-    }
-  }
+  my @author
+   = ( substr( $author, 0, 1 ), substr( $author, 0, 2 ), $author );
 
-  return
-     substr( $author, 0, 1 ) . '/'
-   . substr( $author, 0, 2 ) . '/'
-   . $author;
+  my $dm = $self->_cfg( 'dirmode' );
+  my @new
+   = _make_path( File::Spec->catdir( $dir, 'authors', 'id', @author ),
+    defined $dm ? { mode => oct $dm } : {} );
+
+  return return File::Spec->catdir( @author );
 }
 
-sub _mkpath {
-  my $paths = shift;
-  my $mode  = shift;
-
-  foreach my $path ( @$paths ) {
-    my $partpath;
-    foreach my $subdir ( split( "/", $path ) ) {
-      $partpath .= $subdir;
-      if ( length( $subdir ) && not -e $partpath ) {
-        mkdir $partpath;
-        chmod( $mode, $partpath ) if ( $mode );
-      }
-      $partpath .= '/';
-    }
-  }
-}
+#sub _fmtmodule {
+#  my ( $module, $file, $version ) = @_;
+#  return sprintf "%-40s %s", "$module $version", $file;
+#}
 
 sub _fmtmodule {
   my ( $module, $file, $version ) = @_;
@@ -565,9 +566,7 @@ sub _fmtmodule {
   return "$module $version  $file";
 }
 
-sub _cfg {
-  $_[0]->{config}{ $_[1] };
-}
+sub _cfg { $_[0]->{config}{ $_[1] } }
 
 sub _readpkgs {
   my $self = shift;
