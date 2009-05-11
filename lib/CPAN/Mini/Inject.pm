@@ -65,7 +65,7 @@ A C<CPAN::Mini::Inject> ISA L<CPAN::Mini>. Refer to the
 L<documentation|CPAN::Mini> for that module for details of the interface
 C<CPAN::Mini::Inject> inherits from it.
 
-=head2 new()
+=head2 C<new>
 
 Create a new CPAN::Mini::Inject object.
 
@@ -78,7 +78,7 @@ sub new {
   return $self;
 }
 
-=head2 loadcfg()
+=head2 C<loadcfg>
 
 loadcfg accepts a CPAN::Mini::Inject config file or if not defined
 will search the following four places in order:
@@ -107,12 +107,12 @@ sub loadcfg {
   my $self = shift;
   my $cfgfile = shift || _findcfg();
 
-  croak 'Unable to find config file' unless ( $cfgfile );
+  croak 'Unable to find config file' unless $cfgfile;
   $self->{cfgfile} = $cfgfile;
   return $self;
 }
 
-=head2 parsecfg()
+=head2 C<parsecfg>
 
 parsecfg reads the config file stored in the instance variable cfgfile and
 creates a hash in config with each setting.
@@ -163,31 +163,32 @@ sub parsecfg {
   my $self    = shift;
   my $cfgfile = shift;
 
-  delete $self->{config} if ( defined( $self->{config} ) );
+  delete $self->{config} if defined( $self->{config} );
 
   my %required = ( local => 1, remote => 1 );
 
-  delete $self->{cfgfile} if ( $cfgfile );
-  $self->loadcfg( $cfgfile ) unless ( $self->{cfgfile} );
+  delete $self->{cfgfile} if $cfgfile;
+  $self->loadcfg( $cfgfile ) unless $self->{cfgfile};
 
   if ( -r $self->{cfgfile} ) {
-    open( CFGFILE, $self->{cfgfile} );
+    open( CFGFILE, $self->{cfgfile} )
+     or croak "Can't read ", $self->{cfgfile}, " ($!)";
     while ( <CFGFILE> ) {
-      next if ( /^\s*#/ );
-      $self->{config}{$1} = $2 if ( /([^:\s]+)\s*:\s*(.*)$/ );
-      delete $required{$1} if ( defined( $required{$1} ) );
+      next if /^\s*#/;
+      $self->{config}{$1} = $2 if /([^:\s]+)\s*:\s*(.*)$/;
+      delete $required{$1} if defined( $required{$1} );
     }
     close( CFGFILE );
 
     croak 'Required parameter(s): '
      . join( ' ', keys( %required ) )
      . ' missing.'
-     if ( keys( %required ) );
+     if keys( %required );
   }
   return $self;
 }
 
-=head2 testremote()
+=head2 C<testremote>
 
 Test each site listed in the remote parameter of the config file by performing
 a get on each site in order for authors/01mailrc.txt.gz. The first site to
@@ -203,28 +204,28 @@ sub testremote {
   my $self    = shift;
   my $verbose = shift;
 
-  $self->{site} = undef if ( $self->{site} );
+  $self->{site} = undef if $self->{site};
 
-  $ENV{FTP_PASSIVE} = 1 if ( $self->_cfg( 'passive' ) );
+  $ENV{FTP_PASSIVE} = 1 if $self->_cfg( 'passive' );
 
-  for my $site ( split( /\s+/, $self->_cfg( 'remote' ) ) ) {
-    $site .= '/' unless ( $site =~ m/\/$/ );
+  SITE: for my $site ( split( /\s+/, $self->_cfg( 'remote' ) ) ) {
+    $site .= '/' unless $site =~ m/\/$/;
 
-    print "Testing site: $site\n" if ( $verbose );
+    print "Testing site: $site\n" if $verbose;
 
     if ( get( $site . 'authors/01mailrc.txt.gz' ) ) {
       $self->{site} = $site;
-      print "\n$site selected.\n" if ( $verbose );
-      last;
+      print "\n$site selected.\n" if $verbose;
+      last SITE;
     }
   }
 
-  croak "Unable to connect to any remote site" unless ( $self->{site} );
+  croak "Unable to connect to any remote site" unless $self->{site};
 
   return $self;
 }
 
-=head2 update_mirror()
+=head2 C<update_mirror>
 
 This is a subclass of CPAN::Mini.
 
@@ -235,25 +236,25 @@ sub update_mirror {
   my %options = @_;
 
   croak 'Can not write to local: ' . $self->_cfg( 'local' )
-   unless ( -w $self->_cfg( 'local' ) );
+   unless -w $self->_cfg( 'local' );
 
-  $ENV{FTP_PASSIVE} = 1 if ( $self->_cfg( 'passive' ) );
+  $ENV{FTP_PASSIVE} = 1 if $self->_cfg( 'passive' );
 
   $options{local}     ||= $self->_cfg( 'local' );
   $options{trace}     ||= 0;
   $options{skip_perl} ||= $self->_cfg( 'perl' ) || 1;
 
   $self->testremote( $options{trace} )
-   unless ( $self->{site} || $options{remote} );
+   unless $self->{site} || $options{remote};
   $options{remote} ||= $self->{site};
 
   $options{dirmode} ||= oct( $self->_cfg( 'dirmode' )
-     || sprintf( '0%o', 0777 & ~umask() ) );
+     || sprintf( '0%o', 0777 & ~umask ) );
 
   CPAN::Mini->update_mirror( %options );
 }
 
-=head2 add()
+=head2 C<add>
 
 Add a new module to the repository. The add method copies the module
 file into the repository with the same structure as a CPAN site. For
@@ -298,16 +299,16 @@ sub add {
   my $optionchk
    = _optionchk( \%options, qw/module authorid version file/ );
 
-  croak "Required option not specified: $optionchk" if ( $optionchk );
+  croak "Required option not specified: $optionchk" if $optionchk;
   croak "No repository configured"
-   unless ( $self->_cfg( 'repository' ) );
+   unless $self->_cfg( 'repository' );
   croak "Can not write to repository: " . $self->_cfg( 'repository' )
-   unless ( -w $self->_cfg( 'repository' ) );
+   unless -w $self->_cfg( 'repository' );
   croak "Can not read module file: $options{file}"
-   unless ( -r $options{file} );
+   unless -r $options{file};
 
   my $modulefile = basename( $options{file} );
-  $self->readlist unless ( exists( $self->{modulelist} ) );
+  $self->readlist unless exists( $self->{modulelist} );
 
   $options{authorid} = uc( $options{authorid} );
   $self->{authdir} = $self->_authordir( $options{authorid},
@@ -335,7 +336,7 @@ sub add {
   return $self;
 }
 
-=head2 inject()
+=head2 C<inject>
 
 Insert modules from the repository into the local CPAN::Mini mirror. inject
 copies each module into the appropriate directory in the CPAN::Mini mirror
@@ -352,7 +353,7 @@ sub inject {
 
   my $dm = $self->_cfg( 'dirmode' );
   my $dirmode = defined $dm ? oct $dm : undef;
-  $self->readlist unless ( exists( $self->{modulelist} ) );
+  $self->readlist unless exists( $self->{modulelist} );
 
   my %updatedir;
   for my $modline ( @{ $self->{modulelist} } ) {
@@ -368,7 +369,7 @@ sub inject {
      or croak "Copy $source to $tdir failed: $!";
 
     $self->_updperms( $target );
-    print "$target ... injected\n" if ( $verbose );
+    print "$target ... injected\n" if $verbose;
   }
 
   for my $dir ( keys( %updatedir ) ) {
@@ -383,7 +384,7 @@ sub inject {
   return $self;
 }
 
-=head2 updpackages()
+=head2 C<updpackages>
 
 Update the CPAN::Mini mirror's modules/02packages.details.txt.gz with the
 injected module information.
@@ -403,7 +404,7 @@ sub updpackages {
 
 }
 
-=head2 updauthors()
+=head2 C<updauthors>
 
 Update the CPAN::Mini mirror's authors/01mailrc.txt.gz with
 stub information should the author not actually exist on CPAN
@@ -440,7 +441,7 @@ sub updauthors {
 
 }
 
-=head2 readlist()
+=head2 C<readlist>
 
 Load the repository's modulelist.
 
@@ -458,7 +459,7 @@ sub readlist {
   $self->{modulelist} = undef;
 
   my $ml = $self->_modulelist;
-  return $self unless ( -e $ml );
+  return $self unless -e $ml;
 
   open MODLIST, '<', $ml or croak "Can not read module list: $ml ($!)";
   while ( <MODLIST> ) {
@@ -470,7 +471,7 @@ sub readlist {
   return $self;
 }
 
-=head2 writelist()
+=head2 C<writelist>
 
 Write to the repository modulelist.
 
@@ -484,7 +485,7 @@ sub writelist {
    . "/modulelist ERROR: $!"
    unless ( -w $self->{config}{repository} . '/modulelist'
     || -w $self->{config}{repository} );
-  return $self unless ( defined( $self->{modulelist} ) );
+  return $self unless defined( $self->{modulelist} );
 
   open( MODLIST, '>' . $self->_cfg( 'repository' ) . '/modulelist' );
   for ( sort( @{ $self->{modulelist} } ) ) {
@@ -511,7 +512,7 @@ sub _optionchk {
 
   for my $option ( @list ) {
     push @missing, $option
-     unless ( defined $$options{$option} );
+     unless defined $$options{$option};
   }
 
   return join ' ', @missing;
@@ -583,7 +584,7 @@ sub _readpkgs {
 
   while ( $gzread->gzreadline( $package ) ) {
     if ( $inheader ) {
-      $inheader = 0 unless ( $package =~ /\S/ );
+      $inheader = 0 unless $package =~ /\S/;
       next;
     }
     chomp( $package );
@@ -675,7 +676,7 @@ sub _uniq {
 }
 
 sub _fmtdate {
-  my @date = split( /\s+/, scalar( gmtime() ) );
+  my @date = split( /\s+/, scalar( gmtime ) );
   return "$date[0], $date[2] $date[1] $date[4] $date[3] GMT";
 }
 
