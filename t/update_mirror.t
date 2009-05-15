@@ -3,7 +3,7 @@ use File::Spec::Functions;
 use strict;
 use warnings;
 
-use lib catdir( 't', 'lib' );
+use lib 't/lib';
 
 BEGIN {
   eval "use CPANServer";

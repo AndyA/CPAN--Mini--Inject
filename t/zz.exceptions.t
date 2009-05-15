@@ -29,20 +29,24 @@ if ( defined( $ENV{MCPANI_CONFIG} ) ) {
   delete $ENV{MCPANI_CONFIG};
 }
 
-my $mcpi = CPAN::Mini::Inject->new;
 # loadcfg()
 SKIP: {
-  skip 'Config file exists', 1 if ( chkcfg() );
+  skip 'Config file exists', 1 if chkcfg();
+  my $mcpi = CPAN::Mini::Inject->new;
   dies_ok { $mcpi->loadcfg } 'No config file';
 }
 
-# parsecfg()
-dies_ok { $mcpi->parsecfg( 't/.mcpani/config_bad' ); }
-'Missing config option';
+{
+  # parsecfg()
+  my $mcpi = CPAN::Mini::Inject->new;
+  dies_ok { $mcpi->parsecfg( 't/.mcpani/config_bad' ); }
+  'Missing config option';
+}
 
 # readlist()
 SKIP: {
   skip 'User is superuser and can always read', 1 if $< == 0;
+  my $mcpi = CPAN::Mini::Inject->new;
 
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
   mkdir 't/local/MYCPAN';
@@ -51,64 +55,79 @@ SKIP: {
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
 }
 
-$mcpi->parsecfg( 't/.mcpani/config' );
+{
+  my $mcpi = CPAN::Mini::Inject->new;
+  $mcpi->parsecfg( 't/.mcpani/config' );
 
-# add()
-dies_ok {
-  $mcpi->add(
-    module   => 'CPAN::Mini::Inject',
-    authorid => 'SSORICHE',
-    version  => '0.01'
-  );
+  # add()
+  dies_ok {
+    $mcpi->add(
+      module   => 'CPAN::Mini::Inject',
+      authorid => 'SSORICHE',
+      version  => '0.01'
+    );
+  }
+  'Missing add param';
+
+  dies_ok {
+    $mcpi->add(
+      module   => 'CPAN::Mini::Inject',
+      authorid => 'SSORICHE',
+      version  => '0.01',
+      file     => 'blahblah'
+    );
+  }
+  'Module file not readable';
+
 }
-'Missing add param';
-dies_ok {
-  $mcpi->add(
-    module   => 'CPAN::Mini::Inject',
-    authorid => 'SSORICHE',
-    version  => '0.01',
-    file     => 'blahblah'
-  );
+
+{
+  my $mcpi = CPAN::Mini::Inject->new;
+  $mcpi->parsecfg( 't/.mcpani/config_norepo' );
+
+  dies_ok {
+    $mcpi->add(
+      module   => 'CPAN::Mini::Inject',
+      authorid => 'SSORICHE',
+      version  => '0.01',
+      file     => 'test-0.01.tar.gz'
+    );
+  }
+  'Missing config repository';
+
 }
-'Module file not readable';
 
-$mcpi->parsecfg( 't/.mcpani/config_norepo' );
+SKIP: {
+  skip "We don't have a r/o repo", 2;
+  my $mcpi = CPAN::Mini::Inject->new;
+  $mcpi->parsecfg( 't/.mcpani/config_read' );
 
-dies_ok {
-  $mcpi->add(
-    module   => 'CPAN::Mini::Inject',
-    authorid => 'SSORICHE',
-    version  => '0.01',
-    file     => 'test-0.01.tar.gz'
-  );
+  dies_ok {
+    $mcpi->add(
+      module   => 'CPAN::Mini::Inject',
+      authorid => 'SSORICHE',
+      version  => '0.01',
+      file     => 'test-0.01.tar.gz'
+    );
+  }
+  'read-only repository';
+
+  $mcpi->{config}{remote} = "ftp://blahblah http://blah blah";
+  dies_ok { $mcpi->testremote } 'No reachable site';
+
 }
-'Missing config repository';
-
-$mcpi->parsecfg( 't/.mcpani/config_read' );
-
-dies_ok {
-  $mcpi->add(
-    module   => 'CPAN::Mini::Inject',
-    authorid => 'SSORICHE',
-    version  => '0.01',
-    file     => 'test-0.01.tar.gz'
-  );
-}
-'read-only repository';
 
 # writelist()
 SKIP: {
   skip 'User is superuser and can always write', 1 if $< == 0;
 
+  my $mcpi = CPAN::Mini::Inject->new;
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
   mkdir 't/local/MYCPAN';
   $mcpi->parsecfg( 't/.mcpani/config_nowrite' );
   dies_ok { $mcpi->writelist } 'fail write file';
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
 }
-
-$mcpi->{config}{remote} = "ftp://blahblah http://blah blah";
-dies_ok { $mcpi->testremote } 'No reachable site';
 
 # Setup routines
 sub genmodlist {
