@@ -1,5 +1,4 @@
 \.tmproj$
-\.tar\.gz$
 \B\.svn\b
 \B\.git\b
 \B\.gitignore\b
@@ -15,7 +14,6 @@
 ^_build/
 ~$
 ^\.DS_Store
-\.(old|tmp|bak)$
 ^#.*#$
 ^\.#
 ^cover_db
@@ -24,7 +22,6 @@
 \.swp$
 ^\.prove$
 ^Session\.vim$
-CPAN-Mini-Inject-*
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -49,7 +46,5 @@ CPAN-Mini-Inject-*
 \.old$
 \#$
 \b\.#
-#\.bak$
 # Avoid Devel::Cover files.
 \bcover_db\b
-^CPAN-Mini-Inject-

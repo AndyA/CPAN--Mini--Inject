@@ -3,9 +3,8 @@ Build.PL
 Changes
 inc/MyBuilder.pm
 lib/CPAN/Mini/Inject.pm
-Makefile.PL
-MANIFEST
-MANIFEST.SKIP
+lib/CPAN/Mini/Inject/Config.pm
+MANIFEST			This list of files
 META.yml
 README
 t/.mcpani/config
@@ -26,6 +25,7 @@ t/html/CPAN-Mini-Inject-1.01.tar.gz
 t/html/index.html
 t/inject.t
 t/lib/CPANServer.pm
+t/lib/filenames.pl
 t/loadcfg.t
 t/local/01mailrc.txt.gz.bak
 t/local/CPAN/modules/02packages.details.txt.gz.bak
@@ -42,4 +42,3 @@ t/testremote.t
 t/update_mirror.t
 t/writelist.t
 t/zz.exceptions.t
-TODO
