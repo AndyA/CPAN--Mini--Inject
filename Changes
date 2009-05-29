@@ -1,5 +1,8 @@
 Revision history for CPAN-Mini-Inject
 
+0.25    2009/05/29
+        - Move to GitHub
+
 0.24    2009/05/10
         - Made tests use a port (11027) other than 8080 to avoid clashes
           with existing services.
