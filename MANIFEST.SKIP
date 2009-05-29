@@ -1,11 +1,36 @@
+\.tmproj$
+\.tar\.gz$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+^\.cvsignore
+^MANIFEST\.
+^Makefile$
+^Build$
+^andy/
+^incoming/
+^t/disabled/
+^blib/
+^pm_to_blib$
+^_build/
+~$
+^\.DS_Store
+\.(old|tmp|bak)$
+^#.*#$
+^\.#
+^cover_db
+^try[.]store$
+^TODO$
+\.swp$
+^\.prove$
+^Session\.vim$
+CPAN-Mini-Inject-*
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
 \bSCCS\b
 ,v$
-\B\.svn\b
 \b_darcs\b
-\B\.git\b
 \B\.gitignore
 \B\.releaserc
 
@@ -17,21 +42,14 @@
 \bpm_to_blib\.ts$
 \bpm_to_blib$
 \bblibdirs\.ts$         # 6.18 through 6.25 generated this
-
 # Avoid Module::Build generated and utility files.
 \bBuild$
 \b_build/
-
 # Avoid temp and backup files.
-~$
 \.old$
 \#$
 \b\.#
 #\.bak$
-
 # Avoid Devel::Cover files.
 \bcover_db\b
-
 ^CPAN-Mini-Inject-
-^Session\.vim$
-\.swp$

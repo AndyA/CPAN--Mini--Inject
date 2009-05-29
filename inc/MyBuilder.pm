@@ -28,6 +28,14 @@ sub _auto_repository {
     my $info = `svn info .`;
     return $1 if $info =~ /^URL:\s+(.+)$/m;
   }
+  elsif ( -d '.git' ) {
+    my $info = `git remote -v`;
+    return unless $info =~ /^origin\s+(.+)$/m;
+    my $url = $1;
+    # Special case: patch up github URLs
+    $url =~ s!^git\@github\.com:!git://github.com/!;
+    return $url;
+  }
   return;
 }
 
