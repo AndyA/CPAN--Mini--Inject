@@ -8,7 +8,7 @@ use Archive::Tar;
 use CPAN::Mini::Inject;
 use Env;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 our %options = ();
 
 sub print_version {
