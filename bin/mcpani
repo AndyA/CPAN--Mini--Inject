@@ -177,6 +177,7 @@ GetOptions(
   'modversion=s' => \$options{version},
   'file=s'       => \$options{file},
   'all-in-meta'  => \$options{'all-in-meta'},
+  'signing-key=s' => \$options{'signing_key'},
 ) or exit 1;
 
 unless ( defined( $options{action} ) && chkactions() ) {
@@ -185,6 +186,9 @@ unless ( defined( $options{action} ) && chkactions() ) {
 }
 
 my $mcpi = CPAN::Mini::Inject->new->loadcfg( $options{cfg} )->parsecfg;
+
+$CPAN::Checksums::SIGNING_KEY = $options{'signing_key'}
+    if ($options{'signing_key'});
 
 &{ $options{action} }( $mcpi );
 
@@ -221,6 +225,7 @@ Options:
     -p, --passive       Enable passive ftp for mirroring.
     -v, --verbose       verbose output
     -V, --version       Version information.
+        --signing-key   See CPAN::Checksums $SIGNING_KEY
 
 
 =head1 OVERVIEW
