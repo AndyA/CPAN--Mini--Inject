@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use CPAN::Mini::Inject;
 use File::Path;
@@ -14,6 +14,11 @@ $mcpi->add(
   authorid => 'SSORICHE',
   version  => '0.01',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+)->add(
+  module   => 'CPAN::Mini::Inject',
+  authorid => 'SSORICHE',
+  version  => '0.02',
+  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
 );
 is( $mcpi->{authdir}, 'S/SS/SSORICHE', 'author directory' );
 ok(
@@ -21,9 +26,13 @@ ok(
   'Added module is readable'
 );
 my $module
- = "CPAN::Mini::Inject                 0.01  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
+ = "CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
 ok( grep( /$module/, @{ $mcpi->{modulelist} } ),
   'Module added to list' );
+is( grep( /^CPAN::Mini::Inject\s+/, @{ $mcpi->{modulelist} } ),
+  1,
+  'Module added to list just once'
+);
 
 SKIP: {
   skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin/ );
