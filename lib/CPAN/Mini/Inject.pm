@@ -691,6 +691,8 @@ Shawn Sorichetti, C<< <ssoriche@cpan.org> >>
 Special thanks to David Bartle, for bringing this module up
 to date, and resolving the reported bugs.
 
+Thanks to Jozef Kutej <jozef@kutej.net> for numerous patches.
+
 =head1 Bugs
 
 Please report any bugs or feature requests to
