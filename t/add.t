@@ -15,6 +15,7 @@ $mcpi->add(
   version  => '0.01',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
  )->add(
+)->add(
   module   => 'CPAN::Mini::Inject',
   authorid => 'SSORICHE',
   version  => '0.02',
