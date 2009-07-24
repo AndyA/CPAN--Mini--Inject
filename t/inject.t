@@ -106,13 +106,12 @@ Description:  Package names found in directory $CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
 Written-By:
-Line-Count:   7
+Line-Count:   6
 Last-Updated:
 
 Acme::Code::Police               2.1828  O/OV/OVID/Acme-Code-Police-2.1828.tar.gz
 BFD                                0.31  R/RB/RBS/BFD-0.31.tar.gz
 CPAN::Mini                         0.16  R/RJ/RJBS/CPAN-Mini-0.16.tar.gz
-CPAN::Mini::Inject                 0.01  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
 CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
 CPAN::Nox                          1.02  A/AN/ANDK/CPAN-1.76.tar.gz
 CPANPLUS                          0.049  A/AU/AUTRIJUS/CPANPLUS-0.049.tar.gz

@@ -308,6 +308,9 @@ sub add {
 
   $self->_updperms( $target );
 
+  # remove old version from the list
+  @{ $self->{modulelist} } = grep { $_ !~ m/$options{module}\s+/ } @{ $self->{modulelist} };
+  
   push(
     @{ $self->{modulelist} },
     _fmtmodule(
