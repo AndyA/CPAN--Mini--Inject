@@ -1,5 +1,15 @@
 Revision history for CPAN-Mini-Inject
 
+0.27    2010/01/28
+        All the following are thanks to Jozef Kutej <jozef@kutej.net>:
+
+        - --discover-packages option added to parse .pm files inside
+          --file and extract package names andV versions.
+
+        - allow CHECKSUMS signing.
+
+        - keep just last added module version in 02packages.details.txt.
+
 0.26    2009/06/15
         - Specify minimum File::Path version
 
