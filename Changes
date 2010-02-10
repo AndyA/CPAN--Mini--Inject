@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+0.27    ????/??/??
+        - Skip tests that are unreliable under a DNS regime where any
+          hostname resolves.
+
 0.26    2009/06/15
         - Specify minimum File::Path version
 

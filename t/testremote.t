@@ -1,5 +1,6 @@
 use Test::More;
 
+use LWP;
 use CPAN::Mini::Inject;
 use lib 't/lib';
 
@@ -27,10 +28,17 @@ is( $mcpi->{site}, 'http://localhost:11027/', 'Correct remote URL' );
 
 $mcpi->loadcfg( 't/.mcpani/config_badremote' )->parsecfg;
 
-$mcpi->testremote;
-is( $mcpi->{site}, 'http://localhost:11027/',
-  'Selects correct remote URL' );
+SKIP: {
+  skip 'Test fails with funky DNS providers', 1
+   if can_fetch( 'http://blahblah' );
+  # This fails with OpenDNS &c
+  $mcpi->testremote;
+  is( $mcpi->{site}, 'http://localhost:11027/',
+    'Selects correct remote URL' );
+}
 
 kill( 9, $pid );
 
 unlink( 't/testconfig' );
+
+sub can_fetch { LWP::UserAgent->new->get( shift )->is_success }
