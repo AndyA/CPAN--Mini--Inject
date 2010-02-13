@@ -510,23 +510,6 @@ sub _optionchk {
   return join ' ', @missing;
 }
 
-# TODO this stuff has moved to ::Config
-sub _findcfg {
-  my @try = (
-    ( defined $ENV{MCPANI_CONFIG} ? ( [ $ENV{MCPANI_CONFIG} ] ) : () ),
-    (
-      defined $ENV{HOME} ? ( [ $ENV{HOME}, '.mcpani', 'config' ] ) : ()
-    ),
-  );
-  push @try, ['/usr/local/etc/mcpani'], ['/etc/mcpani']
-   unless $^O =~ /MSWin32/;
-  for my $try ( @try ) {
-    my $file = File::Spec->catfile( @$try );
-    return $file if -r $file;
-  }
-  return undef;
-}
-
 sub _make_path {
   my $um = umask 0;
   make_path( @_ );
@@ -547,17 +530,11 @@ sub _authordir {
   return return File::Spec->catdir( @author );
 }
 
-#sub _fmtmodule {
-#  my ( $module, $file, $version ) = @_;
-#  return sprintf "%-40s %s", "$module $version", $file;
-#}
-
 sub _fmtmodule {
   my ( $module, $file, $version ) = @_;
-
-  $module .= ' ' while ( length( $module ) + length( $version ) < 38 );
-
-  return "$module $version  $file";
+  my $fw = 38 - length $version;
+  $fw = length $module if $fw < length $module;
+  return sprintf "%-${fw}s %s  %s", $module, $version, $file;
 }
 
 sub _cfg { $_[0]->{config}{ $_[1] } }

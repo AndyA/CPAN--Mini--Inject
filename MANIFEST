@@ -4,7 +4,7 @@ Changes
 inc/MyBuilder.pm
 lib/CPAN/Mini/Inject.pm
 lib/CPAN/Mini/Inject/Config.pm
-MANIFEST			This list of files
+MANIFEST
 META.yml
 README
 t/.mcpani/config
@@ -34,6 +34,7 @@ t/new.t
 t/parsecfg.t
 t/pod-coverage.t
 t/pod.t
+t/private.t
 t/read/authors/01mailrc.txt.gz
 t/read/MYCPAN/modulelist
 t/read/MYCPAN/test-0.01.tar.gz
