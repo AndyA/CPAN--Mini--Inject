@@ -291,11 +291,6 @@ Options:
     -V, --version       Version information.
         --signing-key   See CPAN::Checksums $SIGNING_KEY
 
-
-=head1 OVERVIEW
-
-F<mcpani> is a command-line brief description goes here.
-
 =head1 COMMAND LINE OPTIONS
 
 =head2 --add
