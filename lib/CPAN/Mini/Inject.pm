@@ -224,6 +224,7 @@ sub update_mirror {
   $options{local}     ||= $self->config->get( 'local' );
   $options{trace}     ||= 0;
   $options{skip_perl} ||= $self->config->get( 'perl' ) || 1;
+  $options{skip_cleanup} ||= $self->config->get( 'skip_cleanup' ) || 0;
 
   $self->testremote( $options{trace} )
    unless ( $self->site || $options{remote} );
