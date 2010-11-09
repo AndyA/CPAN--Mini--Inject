@@ -59,6 +59,15 @@ SKIP: {
   );
 }
 
+
+$mcpi->readlist->add(
+  module   => 'CPAN::Mini::Inject',
+  authorid => 'SSORICHE',
+  version  => '0.45',
+  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+)->writelist;
+$mcpi->inject;
+
 my @goodfile = <DATA>;
 ok( my $gzread
    = gzopen( 't/local/CPAN/modules/02packages.details.txt.gz', 'rb' ) );
@@ -112,6 +121,6 @@ Last-Updated:
 Acme::Code::Police               2.1828  O/OV/OVID/Acme-Code-Police-2.1828.tar.gz
 BFD                                0.31  R/RB/RBS/BFD-0.31.tar.gz
 CPAN::Mini                         0.16  R/RJ/RJBS/CPAN-Mini-0.16.tar.gz
-CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
+CPAN::Mini::Inject                 0.45  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
 CPAN::Nox                          1.02  A/AN/ANDK/CPAN-1.76.tar.gz
 CPANPLUS                          0.049  A/AU/AUTRIJUS/CPANPLUS-0.049.tar.gz
