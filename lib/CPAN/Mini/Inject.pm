@@ -576,6 +576,26 @@ sub _writepkgs {
    or croak
    "Can't open local 02packages.details.txt.gz for writing: $gzerrno";
 
+
+  # XXX
+  # make sure we never write a package twice, keep only the biggest release
+  my %seen;
+  for my $p (@$pkgs) {
+      if ($p =~ /^(\S+)\s+([\d\.\_]+)\s+(\S+)/) {
+          my ($module, $version) = ($1, $2);
+
+          # if we already have a bigger version for $module, skip this line
+          if (defined $seen{$module}) {
+              if ($seen{$module}{version} >= $version) {
+                  next;
+              }
+          }
+
+          $seen{$module}{version} = $version;
+          $seen{$module}{line}    = $p;
+      }
+  }
+
   $gzwrite->gzwrite( "File:         02packages.details.txt\n" );
   $gzwrite->gzwrite(
     "URL:          http://www.perl.com/CPAN/modules/02packages.details.txt\n"
@@ -588,12 +608,11 @@ sub _writepkgs {
     "Intended-For: Automated fetch routines, namespace documentation.\n"
   );
   $gzwrite->gzwrite( "Written-By:   CPAN::Mini::Inject $VERSION\n" );
-  $gzwrite->gzwrite( "Line-Count:   " . scalar( @$pkgs ) . "\n" );
+  $gzwrite->gzwrite( "Line-Count:   " . scalar( keys %seen ) . "\n" );
   # Last-Updated: Sat, 19 Mar 2005 19:49:10 GMT
   $gzwrite->gzwrite( "Last-Updated: " . _fmtdate() . "\n\n" );
 
-  $gzwrite->gzwrite( "$_\n" ) for ( @$pkgs );
-
+  $gzwrite->gzwrite( "$_\n" ) for map { $seen{$_}{line} } sort keys %seen;
   $gzwrite->gzclose;
 
 }
