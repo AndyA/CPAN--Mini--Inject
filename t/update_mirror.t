@@ -59,5 +59,5 @@ ok(
   ),
   'CPAN::Mini::Inject'
 );
-
+sleep 1; # allow locks to expire
 rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
