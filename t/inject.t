@@ -76,6 +76,7 @@ while ( $gzread->gzreadline( $package ) ) {
   }
   push( @packages, $package );
 }
+$gzread->gzclose;
 
 is_deeply( \@goodfile, \@packages );
 
@@ -89,6 +90,7 @@ while ( $gzauthread->gzreadline( $author ) ) {
     $author_was_injected++;
   }
 }
+$gzauthread->gzclose;
 ok( $author_was_injected,      'author injected into 01mailrc.txt.gz' );
 ok( $author_was_injected == 1, 'author injected exactly 1 time' );
 
