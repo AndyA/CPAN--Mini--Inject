@@ -80,11 +80,11 @@ sub _find_config {
     $ENV{MCPANI_CONFIG},
     (
       defined $ENV{HOME}
-      ? catfile( $ENV{HOME}, qw(.mcpani config) )
+      ? File::Spec::Unix->catfile( $ENV{HOME}, qw(.mcpani config) )
       : ()
     ),
-    catfile( rootdir(), qw(usr local etc mcpani) ),
-    catfile( rootdir(), qw(etc mcpani) ),
+    File::Spec::Unix->catfile( File::Spec::Unix->rootdir(), qw(usr local etc mcpani) ),
+    File::Spec::Unix->catfile( File::Spec::Unix->rootdir(), qw(etc mcpani) ),
   );
 
   for my $file ( @files ) {

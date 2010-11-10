@@ -527,7 +527,7 @@ sub _authordir {
    = _make_path( File::Spec->catdir( $dir, 'authors', 'id', @author ),
     defined $dm ? { mode => oct $dm } : {} );
 
-  return return File::Spec->catdir( @author );
+  return File::Spec::Unix->catdir( @author );
 }
 
 sub _fmtmodule {
