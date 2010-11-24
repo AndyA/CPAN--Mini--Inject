@@ -3,6 +3,9 @@ Revision history for CPAN-Mini-Inject
 0.28    ????/??/??
         - Skip tests that are unreliable under a DNS regime where any
           hostname resolves.
+        - keep just the last added module, even if there was one in
+          02packages.details.txt before we injected
+          (Paul Driver <frodwith@cpan.org>)
 
 0.27    2010/01/28
         All the following are thanks to Jozef Kutej <jozef@kutej.net>:
