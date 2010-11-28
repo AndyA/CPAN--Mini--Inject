@@ -1,4 +1,3 @@
-*.bak
 *.tar.gz
 .lwpcookies
 .prove
@@ -7,7 +6,7 @@ META.yml
 Makefile
 Makefile.old
 Session.vim
-URI-geo-*
+CPAN-Mini-*
 _build*
 blib*
 cover_db
