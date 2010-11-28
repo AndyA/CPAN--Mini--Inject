@@ -3,7 +3,9 @@ Revision history for CPAN-Mini-Inject
 0.28    ????/??/??
         - Skip tests that are unreliable under a DNS regime where any
           hostname resolves.
-		- RT 63350 - Anchor the regex to filter old modules
+        - RT 63350 - Anchor the regex to filter old modules
+        - RT 55463 - Don't use .bak for test files
+        - RT 63407 - Win32 fixes related to file locks in tests
 
 0.27    2010/01/28
         All the following are thanks to Jozef Kutej <jozef@kutej.net>:
