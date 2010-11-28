@@ -315,7 +315,7 @@ sub add {
   push(
     @{ $self->{modulelist} },
     _fmtmodule(
-      $options{module}, $self->{authdir} . "/$modulefile",
+      $options{module}, File::Spec::Unix->catfile( File::Spec->splitdir( $self->{authdir} ), $modulefile ),
       $options{version}
     )
   );
