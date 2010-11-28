@@ -46,6 +46,8 @@ SKIP: {
 # readlist()
 SKIP: {
   skip 'User is superuser and can always read', 1 if $< == 0;
+  skip 'User is generally superuser under cygwin and can read', 1 if $^O eq 'cygwin';
+
   my $mcpi = CPAN::Mini::Inject->new;
 
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
@@ -120,6 +122,7 @@ SKIP: {
 # writelist()
 SKIP: {
   skip 'User is superuser and can always write', 1 if $< == 0;
+  skip 'User is generally superuser under cygwin and can write', 1 if $^O eq 'cygwin';
 
   my $mcpi = CPAN::Mini::Inject->new;
   rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
