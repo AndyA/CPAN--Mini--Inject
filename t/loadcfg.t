@@ -20,18 +20,19 @@ if ( defined( $ENV{MCPANI_CONFIG} ) ) {
   delete $ENV{MCPANI_CONFIG};
 }
 
+my $native_path = File::Spec->catfile( qw( t .mcpani config ) );
 my $mcpi = CPAN::Mini::Inject->new;
 
-$mcpi->loadcfg( 't/.mcpani/config' );
-is( $mcpi->{cfgfile}, 't/.mcpani/config' );
+$mcpi->loadcfg( $native_path );
+is( $mcpi->{cfgfile}, $native_path );
 
 $ENV{HOME} = 't';
 $mcpi->loadcfg;
-is( $mcpi->{cfgfile}, 't/.mcpani/config' );
+is( $mcpi->{cfgfile}, $native_path );
 
-$ENV{MCPANI_CONFIG} = 't/.mcpani/config_mcpi';
+$ENV{MCPANI_CONFIG} = $native_path;
 $mcpi->loadcfg;
-is( $mcpi->{cfgfile}, 't/.mcpani/config_mcpi' );
+is( $mcpi->{cfgfile}, $native_path );
 
 # XXX add tests for /usr/local/etc/mcpani and /etc/minicpani
 
