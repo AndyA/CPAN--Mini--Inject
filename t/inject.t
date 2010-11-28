@@ -8,13 +8,13 @@ use Compress::Zlib;
 
 rmtree( ['t/local/MYCPAN/modulelist'], 0, 1 );
 copy(
-  't/local/CPAN/modules/02packages.details.txt.gz.bak',
+  't/local/CPAN/modules/02packages.details.txt.gz.original',
   't/local/CPAN/modules/02packages.details.txt.gz'
 );
 rmtree( ['t/local/CPAN/authors'], 0, 1 );
 mkdir( 't/local/CPAN/authors' );
 copy(
-  't/local/01mailrc.txt.gz.bak',
+  't/local/01mailrc.txt.gz.original',
   't/local/CPAN/authors/01mailrc.txt.gz'
 );
 mkdir( 't/local/MYCPAN' );

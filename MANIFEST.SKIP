@@ -48,3 +48,4 @@
 \b\.#
 # Avoid Devel::Cover files.
 \bcover_db\b
+^MYMETA.yml$

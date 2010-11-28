@@ -27,8 +27,8 @@ t/inject.t
 t/lib/CPANServer.pm
 t/lib/filenames.pl
 t/loadcfg.t
-t/local/01mailrc.txt.gz.bak
-t/local/CPAN/modules/02packages.details.txt.gz.bak
+t/local/01mailrc.txt.gz.original
+t/local/CPAN/modules/02packages.details.txt.gz.original
 t/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz
 t/new.t
 t/parsecfg.t
