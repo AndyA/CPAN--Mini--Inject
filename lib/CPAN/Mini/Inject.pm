@@ -310,7 +310,7 @@ sub add {
 
   # remove old version from the list
   @{ $self->{modulelist} }
-   = grep { $_ !~ m/$options{module}\s+/ } @{ $self->{modulelist} };
+   = grep { $_ !~ m/\A$options{module}\s+/ } @{ $self->{modulelist} };
 
   push(
     @{ $self->{modulelist} },
