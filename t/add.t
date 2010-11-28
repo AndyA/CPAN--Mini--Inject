@@ -20,7 +20,9 @@ $mcpi->add(
   version  => '0.02',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
  );
-is( $mcpi->{authdir}, 'S/SS/SSORICHE', 'author directory' );
+
+my $soriche_path = File::Spec->catfile( 'S', 'SS', 'SSORICHE' );
+is( $mcpi->{authdir}, $soriche_path, 'author directory' );
 ok(
   -r 't/local/MYCPAN/authors/id/S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
   'Added module is readable'
