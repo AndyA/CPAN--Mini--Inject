@@ -25,7 +25,7 @@ Version 0.28
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.27_01';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
