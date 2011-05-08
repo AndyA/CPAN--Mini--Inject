@@ -1,6 +1,6 @@
 Revision history for CPAN-Mini-Inject
 
-0.28    ????/??/??
+0.29    ????/??/??
         - Skip tests that are unreliable under a DNS regime where any
           hostname resolves.
         - RT 63350 - Anchor the regex to filter old modules
