@@ -10,7 +10,11 @@ use MyBuilder;
 my $builder = MyBuilder->new(
   module_name       => 'CPAN::Mini::Inject',
   license           => 'perl',
-  dist_author       => 'Andy Armstrong <andy@hexten.net>',
+  dist_author       => [
+    'Shawn Sorichetti <ssoriche@coloredblocks.net>',
+    'Andy Armstrong <andy@hexten.net>',
+    'Christian Walde <walde.christian@googlemail.com',
+  ],
   dist_version_from => 'lib/CPAN/Mini/Inject.pm',
   requires          => {
     'Archive::Tar'              => 0,

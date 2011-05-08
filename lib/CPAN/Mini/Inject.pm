@@ -657,9 +657,9 @@ sub _fmtdate {
 
 L<CPAN::Mini>
 
-=head1 Maintainer
+=head1 Current Maintainer
 
-Andy Armstrong, C<< <andy@hexten.net> >>
+Christian Walde C<< <walde.christian@googlemail.com> >>
 
 =head1 Original Author
 
