@@ -11,12 +11,15 @@ copy(
   't/local/CPAN/modules/02packages.details.txt.gz.original',
   't/local/CPAN/modules/02packages.details.txt.gz'
 );
+chmod oct(666), 't/local/CPAN/modules/02packages.details.txt.gz';
+chmod oct(666), "t/local/CPAN/authors/01mailrc.txt.gz" if -f "t/local/CPAN/authors/01mailrc.txt.gz";
 rmtree( ['t/local/CPAN/authors'], 0, 1 );
 mkdir( 't/local/CPAN/authors' );
 copy(
   't/local/01mailrc.txt.gz.original',
   't/local/CPAN/authors/01mailrc.txt.gz'
 );
+chmod oct(666), 't/local/CPAN/authors/01mailrc.txt.gz';
 mkdir( 't/local/MYCPAN' );
 
 my $mcpi;
