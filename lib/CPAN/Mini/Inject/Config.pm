@@ -12,11 +12,11 @@ CPAN::Mini::Inject::Config - Config for CPAN::Mini::Inject
 
 =head1 VERSION
 
-Version 0.28_01
+Version 0.28_02
 
 =cut
 
-our $VERSION = '0.28_01';
+our $VERSION = '0.28_02';
 
 =head2 C<new>
 

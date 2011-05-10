@@ -6,6 +6,7 @@ Revision history for CPAN-Mini-Inject
         - RT 63350 - Anchor the regex to filter old modules
         - RT 55463 - Don't use .bak for test files
         - RT 63407 - Win32 fixes related to file locks in tests
+        - Changed tests so they'll be able to deal with read-only dist files
 
 0.27    2010/01/28
         All the following are thanks to Jozef Kutej <jozef@kutej.net>:

@@ -43,3 +43,4 @@ t/testremote.t
 t/update_mirror.t
 t/writelist.t
 t/zz.exceptions.t
+META.json
