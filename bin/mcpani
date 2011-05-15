@@ -11,7 +11,7 @@ use Module::Build::ModuleInfo;
 use File::Slurp 'write_file';
 use File::Temp;
 
-our $VERSION = '0.28_02';
+our $VERSION = '0.29';
 our %options = ();
 
 sub print_version {
