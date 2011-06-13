@@ -337,7 +337,7 @@ C<make tardist>).
   Example:
 
   mcpani --add --module CPAN::Mini::Inject --authorid SSORICHE
-         --modversion 0.01 file ./CPAN-Mini-Inject-0.01.tar.gz
+         --modversion 0.01 --file ./CPAN-Mini-Inject-0.01.tar.gz
 
 
 =head2 --update
