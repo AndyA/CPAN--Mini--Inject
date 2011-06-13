@@ -11,7 +11,7 @@ use Module::Build::ModuleInfo;
 use File::Slurp 'write_file';
 use File::Temp;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 our %options = ();
 
 sub print_version {
@@ -82,10 +82,10 @@ sub add {
        {
         version => $version,
         module  => $module
-       };      
+       };
     }
   }
-  
+
   # always add the module/version provided on the command line
   # as well
   push @modules_to_add,
@@ -173,7 +173,7 @@ sub _load_meta {
 
 sub _find_provides {
   my $filename = shift;
-  
+
   my %provides;
 
   print "Parsing *.pm from $options{file}\n"
@@ -188,11 +188,11 @@ sub _find_provides {
   for my $pm_filename ( $tar->list_files() ) {
     next if $pm_filename !~ m/\.pm$/;  # only Perl module files are interesting
     next if $pm_filename =~ m{^t/};    # skip test folder
-    
+
     # write current .pm file to temp file
     my $tmp_filename = File::Temp->new( UNLINK => 1 )->filename;
     write_file($tmp_filename, $tar->get_content( $pm_filename ));
-    
+
     # get module info
     my $info = eval { Module::Build::ModuleInfo->new_from_file($tmp_filename) };
     print 'failed to get module info of "'.$pm_filename.'" - "'.$@.'"'
@@ -201,8 +201,8 @@ sub _find_provides {
 
     foreach my $package (keys %{$info->{'versions'}}) {
       next if $package eq 'main';
-      
-      # set version to undef 
+
+      # set version to undef
       my $version = (
         $info->{'versions'}->{$package}
         ? $info->{'versions'}->{$package}->stringify
@@ -210,7 +210,7 @@ sub _find_provides {
       );
 
       $provides{$package} = $version;
-    }    
+    }
   }
 
   return \%provides;
@@ -311,25 +311,25 @@ exist on CPAN.
 
 =item --modversion
 
-Version number of the module. This must match the version number in the 
+Version number of the module. This must match the version number in the
 file name.
 
 =item --all-in-meta
 
-This option will add every module listed in the 'provides' section of 
+This option will add every module listed in the 'provides' section of
 the META.yml contained in the tar.gz provided by the --file option.
 
 The options --module and --modversion are still recognized.  If the
 same module/version is found in the META.yml it is not duplicated.
 
-If the META.yml file or the 'provides' section is missing, then 
+If the META.yml file or the 'provides' section is missing, then
 a warning is issued and the only module added is the one provided by
 --module / --modversion.
 
 =item --file
 
 File name and path of the module. The file name must follow the
-standard CPAN naming convention (the resulting file from a 
+standard CPAN naming convention (the resulting file from a
 C<make tardist>).
 
 =back
@@ -343,7 +343,7 @@ C<make tardist>).
 =head2 --update
 
 Update your local CPAN Mini mirror from a CPAN site. Once completed
-add the modules contained in the repository to it. This is the same 
+add the modules contained in the repository to it. This is the same
 as running C<mcpani --mirror> followed by C<mcpani --inject>
 
 =head2 --mirror
@@ -364,7 +364,7 @@ option overrides the value in the config file.
 A CPAN site to create the local CPAN Mini mirror from.
 
 =head2 -v, --verbose
-  
+
 Display verbose processing information
 
 =head2 -V, --version
@@ -385,11 +385,11 @@ Description of options:
 
 =over 4
 
-=item * local 
+=item * local
 
 location to store local CPAN::Mini mirror (*REQUIRED*)
 
-=item * remote 
+=item * remote
 
 CPAN site(s) to mirror from. Multiple sites can be listed, with spaces
 between them. (*REQUIRED*)
@@ -404,7 +404,7 @@ Enable passive FTP.
 
 =item * dirmode
 
-Set the permissions of created directories to the specified mode 
+Set the permissions of created directories to the specified mode
 (octal value). The default value is based on the umask (if supported).
 
 =back
@@ -421,7 +421,7 @@ F<mcpani> will search the following four places in order:
 
 =item * /etc/mcpani
 
-=back 
+=back
 
 =head1 CURRENT MAINTAINER
 
@@ -446,4 +446,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-

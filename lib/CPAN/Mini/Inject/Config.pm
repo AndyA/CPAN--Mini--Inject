@@ -12,11 +12,11 @@ CPAN::Mini::Inject::Config - Config for CPAN::Mini::Inject
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head2 C<new>
 
@@ -54,7 +54,7 @@ will search the following four places in order:
 
 =item * /etc/mcpani
 
-=back 
+=back
 
 
 loadcfg sets the instance variable cfgfile to the file found or undef if
@@ -116,13 +116,13 @@ Description of options:
 
 =over 4
 
-=item * local 
+=item * local
 
 location to store local CPAN::Mini mirror (*REQUIRED*)
 
-=item * remote 
+=item * remote
 
-CPAN site(s) to mirror from. Multiple sites can be listed space separated. 
+CPAN site(s) to mirror from. Multiple sites can be listed space separated.
 (*REQUIRED*)
 
 =item * repository

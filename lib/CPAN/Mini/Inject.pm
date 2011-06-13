@@ -21,11 +21,11 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
@@ -38,9 +38,9 @@ probably want to look at the mcpani command instead.
     $mcpi=CPAN::Mini::Inject->new;
     $mcpi->parsecfg('t/.mcpani/config');
 
-    $mcpi->add( module   => 'CPAN::Mini::Inject', 
-                authorid => 'SSORICHE', 
-                version  => ' 0.01', 
+    $mcpi->add( module   => 'CPAN::Mini::Inject',
+                authorid => 'SSORICHE',
+                version  => ' 0.01',
                 file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
 
     $mcpi->writelist;
@@ -51,7 +51,7 @@ probably want to look at the mcpani command instead.
 
 CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
 then adds modules from your repository to it, allowing the inclusion
-of private modules in a minimal CPAN mirror. 
+of private modules in a minimal CPAN mirror.
 
 =head1 METHODS
 
@@ -81,7 +81,7 @@ sub new {
 
 =head2 C<< config_class( [CLASS] ) >>
 
-Returns the name of the class handling the configuration. 
+Returns the name of the class handling the configuration.
 
 With an argument, it sets the name of the class to handle
 the config. To use that, you'll have to call it before you
@@ -152,8 +152,8 @@ sub parsecfg {
 }
 
 =head2 C<< site( [SITE] ) >>
-	
-Returns the CPAN site that CPAN::Mini::Inject chose from the 
+
+Returns the CPAN site that CPAN::Mini::Inject chose from the
 list specified in the C<remote> directive.
 
 =cut
@@ -252,7 +252,7 @@ The name of the module to add.
 
 =item * authorid
 
-CPAN author id. This does not have to be a real author id. 
+CPAN author id. This does not have to be a real author id.
 
 =item * version
 
@@ -266,9 +266,9 @@ The tar.gz of the module.
 
 =head3 Example
 
-  add( module => 'Module::Name', 
-       authorid => 'AUTHOR', 
-       version => 0.01, 
+  add( module => 'Module::Name',
+       authorid => 'AUTHOR',
+       version => 0.01,
        file => './Module-Name-0.01.tar.gz' );
 
 =cut

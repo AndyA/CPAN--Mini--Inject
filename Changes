@@ -1,9 +1,10 @@
 Revision history for CPAN-Mini-Inject
 
-0.30    ????/??/??
+0.30    2011/06/13
         - keep just the last added module, even if there was one in
           02packages.details.txt before we injected
           (Paul Driver <frodwith@cpan.org>)
+        - documentation fix (Randy Stauner <rwstauner@cpan.org>)
 
 0.29    2011/05/15
         - Skip tests that are unreliable under a DNS regime where any
