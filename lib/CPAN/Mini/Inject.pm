@@ -385,13 +385,17 @@ sub updpackages {
   my $self = shift;
 
   my @modules = sort( @{ $self->{modulelist} } );
+  my $infile  = $self->_readpkgs;
+  my %packages;
 
-  my $packages = $self->_readpkgs;
+  # These need to be unique-per-package, with ones that come from the input
+  # file being overridden.
+  for my $line (@$infile, @modules) {
+    my ($pkg) = split(/\s+/, $line, 2);
+    $packages{$pkg} = $line;
+  };
 
-  $packages = _uniq( $packages, \@modules );
-
-  $self->_writepkgs( $packages );
-
+  $self->_writepkgs( [ sort values %packages ] );
 }
 
 =head2 C<updauthors>
@@ -636,16 +640,6 @@ sub _writeauthors {
 
   $gzwrite->gzclose;
 
-}
-
-sub _uniq {
-  my ( $list1, $list2 ) = @_;
-
-  my %combined = map { $_, undef } @$list1, @$list2;
-
-  my @fulllist = sort( keys( %combined ) );
-  # return \@{sort(keys(%combined))};
-  return \@fulllist;
 }
 
 sub _fmtdate {

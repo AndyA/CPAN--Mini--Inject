@@ -27,7 +27,8 @@ my $module = "S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz";
 
 $mcpi = CPAN::Mini::Inject->new;
 
-## add two modules
+## add three modules (one that was already there, to make sure it isn't
+## duplicated in the output)
 $mcpi->loadcfg( 't/.mcpani/config' )->parsecfg->readlist->add(
   module   => 'CPAN::Mini::Inject',
   authorid => 'SSORICHE',
@@ -38,6 +39,11 @@ $mcpi->loadcfg( 't/.mcpani/config' )->parsecfg->readlist->add(
   authorid => 'SSORICHE',
   version  => '0.02',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+ )->add(
+  module   => 'CPAN::Mini',
+  authorid => 'RJBS',
+  version  => '0.17',
+  file     => 't/local/mymodules/CPAN-Mini-0.17.tar.gz',
  )->writelist;
 
 ok( $mcpi->inject,                        'Copy modules' );
@@ -116,7 +122,7 @@ Last-Updated:
 
 Acme::Code::Police               2.1828  O/OV/OVID/Acme-Code-Police-2.1828.tar.gz
 BFD                                0.31  R/RB/RBS/BFD-0.31.tar.gz
-CPAN::Mini                         0.16  R/RJ/RJBS/CPAN-Mini-0.16.tar.gz
+CPAN::Mini                         0.17  R/RJ/RJBS/CPAN-Mini-0.17.tar.gz
 CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
 CPAN::Nox                          1.02  A/AN/ANDK/CPAN-1.76.tar.gz
 CPANPLUS                          0.049  A/AU/AUTRIJUS/CPANPLUS-0.049.tar.gz
