@@ -78,6 +78,11 @@ sub add {
     my $provides = _find_provides( $options{file} );
 
     while ( my ( $module, $version ) = each( %{$provides} ) ) {
+      # don't auto-discover the main module that we already know about
+      if ( $module eq $options{module} ) {
+        $options{version} ||= $version;
+        next;
+      }
       push @modules_to_add,
        {
         version => $version,
