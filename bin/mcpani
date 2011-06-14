@@ -188,6 +188,7 @@ sub _find_provides {
   for my $pm_filename ( $tar->list_files() ) {
     next if $pm_filename !~ m/\.pm$/;  # only Perl module files are interesting
     next if $pm_filename =~ m{^t/};    # skip test folder
+    next if $pm_filename =~ m{^inc/};  # skip inc folder
     
     # write current .pm file to temp file
     my $tmp_filename = File::Temp->new( UNLINK => 1 )->filename;
