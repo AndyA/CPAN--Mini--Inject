@@ -34,81 +34,19 @@ sub setsub {
 sub add {
   my $mcpi = shift;
 
-  if ( $options{file} =~ /([^\/]*)-([0-9._]+)\.tar\.gz$/ ) {
-    $options{module}  ||= $1;
-    $options{version} ||= $2;
-
-    $options{module} =~ s/-/::/g;
-  }
-
   $mcpi->readlist;
 
-  my @modules_to_add;
-  if ( $options{'all-in-meta'} ) {
-    ## attempt to read the META.yml
-    my $meta_data = _load_meta( $options{file} );
-
-    my $provides = $meta_data->{provides} || {};
-
-    if ( !scalar keys %$provides ) {
-      warn("Could not find the 'provides' section in META.yml. "
-         . "Only adding based on provided command line.\n" );
-    }
-
-    PROVIDE_ENTRY:
-    while ( my ( $name, $info ) = each( %{$provides} ) ) {
-      next PROVIDE_ENTRY if $name eq $options{module};
-      my $v
-       = defined $info->{version}
-       ? $info->{version}
-       : 'undef';
-
-      push @modules_to_add,
-       {
-        version => $v,
-        module  => $name
-       };
-    }
-
-  }
-  elsif ( $options{'discover-packages'} ) {
-    ## attempt to read the META.yml
-    my $meta_data = _load_meta( $options{file} );
-
-    my $provides = _find_provides( $options{file} );
-
-    while ( my ( $module, $version ) = each( %{$provides} ) ) {
-      # don't auto-discover the main module that we already know about
-      if ( $module eq $options{module} ) {
-        $options{version} ||= $version;
-        next;
-      }
-      push @modules_to_add,
-       {
-        version => $version,
-        module  => $module
-       };
-    }
-  }
-
-  # always add the module/version provided on the command line
-  # as well
-  push @modules_to_add,
-   {
-    version => $options{version},
-    module  => $options{module},
-   };
-
-  $mcpi->readlist;
-  for my $item ( @modules_to_add ) {
+  # NOTE: by putting module discovery into the API we've lost
+  # the functionality of printing verbose lines for each added package
     $mcpi->add(
-      module   => $item->{module},
+      module   => $options{module},
       authorid => $options{authorid},
-      version  => $item->{version},
+      version  => $options{version},
       file     => $options{file}
     );
 
-    if ( $options{verbose} ) {
+  if ( $options{verbose} ) {
+    for my $item ( @{ $mcpi->{_added_modules} } ) {
       print "\nAdding module: $item->{module}\n";
       print "Author ID: $options{authorid}\n";
       print "Version: $item->{version}\n";
