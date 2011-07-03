@@ -14,6 +14,7 @@ use File::Copy;
 use File::Path qw( make_path );
 use File::Spec;
 use LWP::Simple;
+use Dist::Metadata ();
 
 =head1 NAME
 
@@ -278,7 +279,7 @@ sub add {
   my %options = @_;
 
   my $optionchk
-   = _optionchk( \%options, qw/module authorid version file/ );
+   = _optionchk( \%options, qw/authorid file/ );
 
   croak "Required option not specified: $optionchk" if $optionchk;
   croak "No repository configured"
@@ -289,6 +290,19 @@ sub add {
 
   croak "Can not read module file: $options{file}"
    unless -r $options{file};
+
+  # attempt to guess module and version
+  my $distmeta = Dist::Metadata->new( file => $options{file} );
+  if ( !$options{module} ) {
+    $options{module} = $distmeta->name;
+    $options{module} =~ s/-/::/g;
+  }
+  $options{version} ||= $distmeta->version;
+
+  $optionchk
+   = _optionchk( \%options, qw/module version/ );
+  croak "Required option not specified and could not be determined: " .
+   $optionchk if $optionchk;
 
   my $modulefile = basename( $options{file} );
   $self->readlist unless exists( $self->{modulelist} );
@@ -308,16 +322,29 @@ sub add {
 
   $self->_updperms( $target );
 
-  # remove old version from the list
-  @{ $self->{modulelist} }
-   = grep { $_ !~ m/\A$options{module}\s+/ } @{ $self->{modulelist} };
+  my $packages = $distmeta->package_versions;
+  # include/overwrite with passed in version
+  $packages->{ $options{module} } = $options{version}
+    if $options{module};
+
+  {
+    my $mods = join('|', keys %$packages);
+    # remove old versions from the list
+    @{ $self->{modulelist} }
+     = grep { $_ !~ m/\A($mods)\s+/ } @{ $self->{modulelist} };
+  }
+
+  # make data available afterwards (since method returns $self)
+  $self->{_added_modules} = $packages;
 
   push(
     @{ $self->{modulelist} },
-    _fmtmodule(
-      $options{module}, File::Spec::Unix->catfile( File::Spec->splitdir( $self->{authdir} ), $modulefile ),
-      $options{version}
-    )
+    map {
+      _fmtmodule(
+        $_, File::Spec::Unix->catfile( File::Spec->splitdir( $self->{authdir} ), $modulefile ),
+        defined($packages->{$_}) ? $packages->{$_} : 'undef'
+      )
+    } keys %$packages
   );
 
   return $self;
