@@ -248,6 +248,10 @@ Packages found in the distribution will be added to the module list
 (for example both C<CPAN::Mini::Inject> and C<CPAN::Mini::Inject::Config>
 will be added to the F<modules/02packages.details.txt.gz> file).
 
+Packages will be looked for in the C<provides> key of the META file if present,
+otherwise the files will be searched with L<Module::Metadata>.
+See L<Dist::Metadata> for more information.
+
 =over 4
 
 =item * module
