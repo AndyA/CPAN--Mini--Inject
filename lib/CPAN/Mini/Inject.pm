@@ -102,7 +102,7 @@ sub config_class {
 
 Returns the configuration object. This object should be from
 the class returned by C<config_class> unless you've done something
-wierd.
+weird.
 
 =cut
 
@@ -360,7 +360,7 @@ sub add {
 
 =head2 C<added_modules>
 
-Retuns a list of hash references describing the modules added by this instance.
+Returns a list of hash references describing the modules added by this instance.
 Each hashref will contain C<file>, C<authorid>, and C<modules>.
 The C<modules> entry is a hashref of module names and versions included in the C<file>.
 
