@@ -304,17 +304,21 @@ sub add {
 
   # attempt to guess module and version
   my $distmeta = Dist::Metadata->new( file => $options{file} );
-  if ( !$options{module} ) {
-    $options{module} = $distmeta->name;
-    $options{module} =~ s/-/::/g;
+  my $packages = $distmeta->package_versions;
+
+  # include passed in module and version
+  if ( $options{module} ) {
+    $packages->{ $options{module} } = $options{version};
   }
-  $options{version} ||= $distmeta->version;
 
-  $optionchk
-   = _optionchk( \%options, qw/module version/ );
+  # if no packages were found we need explicit options
+  if ( !keys %$packages ) {
+    $optionchk
+     = _optionchk( \%options, qw/module version/ );
 
-  croak "Required option not specified and could not be determined: $optionchk"
-   if $optionchk;
+    croak "Required option not specified and no modules were found: $optionchk"
+     if $optionchk;
+  }
 
   my $modulefile = basename( $options{file} );
   $self->readlist unless exists( $self->{modulelist} );
@@ -333,11 +337,6 @@ sub add {
    or croak "Copy failed: $!";
 
   $self->_updperms( $target );
-
-  my $packages = $distmeta->package_versions;
-  # include/overwrite with passed in version
-  $packages->{ $options{module} } = $options{version}
-    if $options{module};
 
   {
     my $mods = join('|', keys %$packages);

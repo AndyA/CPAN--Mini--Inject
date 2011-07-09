@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 use CPAN::Mini::Inject;
 use File::Path;
@@ -24,6 +24,9 @@ $mcpi->add(
   authorid => 'RWSTAUNER',
   #version  => '2.2',
   file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz'
+ )->add(
+  authorid => 'RWSTAUNER',
+  file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-Only.tar.gz'
  );
 
 my $auth_path = File::Spec->catfile( 'R', 'RW', 'RWSTAUNER' );
@@ -32,14 +35,16 @@ is( $mcpi->{authdir}, $auth_path, 'author directory' );
 foreach $dist ( qw(
   t/local/MYCPAN/authors/id/S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
   t/local/MYCPAN/authors/id/R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz
+  t/local/MYCPAN/authors/id/R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-Only.tar.gz
 ) ) {
-  ok( -r $dist, 'Added module is readable' );
+  ok( -r $dist, "Added module '$dist' is readable" );
 }
 
 foreach $line (
   'CPAN::Mini::Inject                 0.01  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
   'Dist::Metadata::Test::MetaFile::PM  2.0  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz',
   'Dist::Metadata::Test::MetaFile      2.2  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz',
+  'Dist::Metadata::Test::MetaFile::DiffName 0.02  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-Only.tar.gz',
 ) {
   ok( grep( /$line/, @{ $mcpi->{modulelist} } ), 'Module added to list' )
     or diag explain [$line, $mcpi->{modulelist}];
@@ -58,6 +63,8 @@ is_deeply(
     # added twice (bug in usage not in reporting)
     { file => 'Dist-Metadata-Test-MetaFile-2.2.tar.gz', authorid => 'RWSTAUNER',
       modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.2' } },
+    { file => 'Dist-Metadata-Test-MetaFile-Only.tar.gz', authorid => 'RWSTAUNER',
+      modules => {'Dist::Metadata::Test::MetaFile::DiffName' => '0.02'} },
   ],
   'info for added modules'
 );

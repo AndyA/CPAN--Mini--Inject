@@ -4,7 +4,7 @@ BEGIN {
   eval "use Test::Exception";
 
   plan skip_all => "Test Exceptions required to test croaks" if $@;
-  plan tests => 9;
+  plan tests => 12;
 }
 
 use CPAN::Mini::Inject;
@@ -81,6 +81,31 @@ SKIP: {
   }
   'Module file not readable';
 
+  lives_ok {
+    $mcpi->add(
+      authorid => 'RWSTAUNER',
+      file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-Only.tar.gz'
+    );
+  }
+  'Ok without module/version when discoverable';
+
+  lives_ok {
+    $mcpi->add(
+      module   => 'Who::Cares',
+      version  => '1',
+      authorid => 'RWSTAUNER',
+      file     => 't/local/mymodules/not-discoverable.tar.gz'
+    );
+  }
+  'Ok without module/version when specified';
+
+  dies_ok {
+    $mcpi->add(
+      authorid => 'RWSTAUNER',
+      file     => 't/local/mymodules/not-discoverable.tar.gz'
+    );
+  }
+  'Dies without module/version when not discoverable';
 }
 
 {
