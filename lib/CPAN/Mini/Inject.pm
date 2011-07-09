@@ -306,9 +306,9 @@ sub add {
   my $distmeta = Dist::Metadata->new( file => $options{file} );
   my $packages = $distmeta->package_versions;
 
-  # include passed in module and version
+  # include passed in module and version (prefer discovered version)
   if ( $options{module} ) {
-    $packages->{ $options{module} } = $options{version};
+    $packages->{ $options{module} } ||= $options{version};
   }
 
   # if no packages were found we need explicit options

@@ -20,9 +20,9 @@ $mcpi->add(
   #version  => '2.1',
   file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz'
  )->add(
-  #module   => 'Dist::Metadata::Test::MetaFile',
+  module   => 'Dist::Metadata::Test::MetaFile',
   authorid => 'RWSTAUNER',
-  #version  => '2.2',
+  version  => '2.3', # package versions do not match this
   file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz'
  )->add(
   authorid => 'RWSTAUNER',
@@ -43,7 +43,7 @@ foreach $dist ( qw(
 foreach $line (
   'CPAN::Mini::Inject                 0.01  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
   'Dist::Metadata::Test::MetaFile::PM  2.0  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz',
-  'Dist::Metadata::Test::MetaFile      2.2  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz',
+  'Dist::Metadata::Test::MetaFile      2.1  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-2.2.tar.gz',
   'Dist::Metadata::Test::MetaFile::DiffName 0.02  R/RW/RWSTAUNER/Dist-Metadata-Test-MetaFile-Only.tar.gz',
 ) {
   ok( grep( /$line/, @{ $mcpi->{modulelist} } ), 'Module added to list' )
@@ -59,10 +59,10 @@ is_deeply(
   [
     { file => 'CPAN-Mini-Inject-0.01.tar.gz', authorid => 'SSORICHE', modules => {'CPAN::Mini::Inject' => '0.01'} },
     { file => 'Dist-Metadata-Test-MetaFile-2.2.tar.gz', authorid => 'RWSTAUNER',
-      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.2' } },
+      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.1' } },
     # added twice (bug in usage not in reporting)
     { file => 'Dist-Metadata-Test-MetaFile-2.2.tar.gz', authorid => 'RWSTAUNER',
-      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.2' } },
+      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.1' } },
     { file => 'Dist-Metadata-Test-MetaFile-Only.tar.gz', authorid => 'RWSTAUNER',
       modules => {'Dist::Metadata::Test::MetaFile::DiffName' => '0.02'} },
   ],
