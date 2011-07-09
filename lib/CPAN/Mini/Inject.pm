@@ -244,12 +244,17 @@ example CPAN-Mini-Inject-0.01.tar.gz is copied to
 MYCPAN/authors/id/S/SS/SSORICHE. add creates the required directory
 structure below the repository.
 
+Packages found in the distribution will be added to the module list
+(for example both C<CPAN::Mini::Inject> and C<CPAN::Mini::Inject::Config>
+will be added to the F<modules/02packages.details.txt.gz> file).
 
 =over 4
 
 =item * module
 
 The name of the module to add.
+The distribution file will be searched for modules
+but you can specify the main one explicitly.
 
 =item * authorid
 
@@ -258,6 +263,8 @@ CPAN author id. This does not have to be a real author id.
 =item * version
 
 The modules version number.
+Module names and versions will be determined,
+but you can specify one explicitly.
 
 =item * file
 
