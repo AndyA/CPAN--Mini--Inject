@@ -36,8 +36,6 @@ sub add {
 
   $mcpi->readlist;
 
-  # NOTE: by putting module discovery into the API we've lost
-  # the functionality of printing verbose lines for each added package
     $mcpi->add(
       module   => $options{module},
       authorid => $options{authorid},
@@ -46,11 +44,15 @@ sub add {
     );
 
   if ( $options{verbose} ) {
-    for my $item ( @{ $mcpi->{_added_modules} } ) {
-      print "\nAdding module: $item->{module}\n";
-      print "Author ID: $options{authorid}\n";
-      print "Version: $item->{version}\n";
-      print "File: $options{file}\n";
+    my @added = $mcpi->added_modules;
+    foreach my $added ( @added ){
+      print "\nAdding File: $added->{file}\n";
+      print "Author ID: $added->{authorid}\n";
+      my $modules = $added->{modules};
+      foreach my $mod ( sort keys %$modules ){
+        print "Module: $mod\n";
+        print "Version: $modules->{$mod}\n";
+      }
       print "To repository: $mcpi->{config}{repository}\n\n";
     }
   }

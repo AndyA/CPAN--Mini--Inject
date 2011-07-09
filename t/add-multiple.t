@@ -1,4 +1,4 @@
-use Test::More tests => 9;
+use Test::More tests => 10;
 
 use CPAN::Mini::Inject;
 use File::Path;
@@ -48,5 +48,18 @@ foreach $line (
   is( grep( /^$pack\s+/, @{ $mcpi->{modulelist} } ),
     1, 'Module added to list just once' );
 }
+
+is_deeply(
+  [$mcpi->added_modules],
+  [
+    { file => 'CPAN-Mini-Inject-0.01.tar.gz', authorid => 'SSORICHE', modules => {'CPAN::Mini::Inject' => '0.01'} },
+    { file => 'Dist-Metadata-Test-MetaFile-2.2.tar.gz', authorid => 'RWSTAUNER',
+      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.2' } },
+    # added twice (bug in usage not in reporting)
+    { file => 'Dist-Metadata-Test-MetaFile-2.2.tar.gz', authorid => 'RWSTAUNER',
+      modules => { 'Dist::Metadata::Test::MetaFile::PM' => '2.0', 'Dist::Metadata::Test::MetaFile' => '2.2' } },
+  ],
+  'info for added modules'
+);
 
 rmtree( 't/local/MYCPAN', 0, 1 );

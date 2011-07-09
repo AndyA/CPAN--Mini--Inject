@@ -335,7 +335,8 @@ sub add {
   }
 
   # make data available afterwards (since method returns $self)
-  $self->{_added_modules} = $packages;
+  push @{ $self->{added_modules} ||= [] },
+    { file => $modulefile, authorid => $options{authorid}, modules => $packages };
 
   push(
     @{ $self->{modulelist} },
@@ -348,6 +349,25 @@ sub add {
   );
 
   return $self;
+}
+
+=head2 C<added_modules>
+
+Retuns a list of hash references describing the modules added by this instance.
+Each hashref will contain C<file>, C<authorid>, and C<modules>.
+The C<modules> entry is a hashref of module names and versions included in the C<file>.
+
+The list is cumulative.
+There will be one entry for each time L</add> was called.
+
+This functionality is mostly provided for the included L<mcpani> script
+to be able to verbosely print all the modules added.
+
+=cut
+
+sub added_modules {
+  my $self    = shift;
+  return @{ $self->{added_modules} ||= [] };
 }
 
 =head2 C<inject>
