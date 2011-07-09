@@ -4,10 +4,8 @@ use strict;
 use Pod::Usage 1.12;
 use Getopt::Long;
 use YAML qw( Load );
-use Archive::Tar;
 use CPAN::Mini::Inject;
 use Env;
-use Module::Build::ModuleInfo;
 use File::Slurp 'write_file';
 use File::Temp;
 
