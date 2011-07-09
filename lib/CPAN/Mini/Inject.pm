@@ -312,8 +312,9 @@ sub add {
 
   $optionchk
    = _optionchk( \%options, qw/module version/ );
-  croak "Required option not specified and could not be determined: " .
-   $optionchk if $optionchk;
+
+  croak "Required option not specified and could not be determined: $optionchk"
+   if $optionchk;
 
   my $modulefile = basename( $options{file} );
   $self->readlist unless exists( $self->{modulelist} );
