@@ -26,8 +26,8 @@ $mcpi->add(
   file     => 't/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz'
  );
 
-my $soriche_path = File::Spec->catfile( 'R', 'RW', 'RWSTAUNER' );
-is( $mcpi->{authdir}, $soriche_path, 'author directory' );
+my $auth_path = File::Spec->catfile( 'R', 'RW', 'RWSTAUNER' );
+is( $mcpi->{authdir}, $auth_path, 'author directory' );
 
 foreach $dist ( qw(
   t/local/MYCPAN/authors/id/S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz
