@@ -22,6 +22,7 @@ my $builder = MyBuilder->new(
     'CPAN::Mini'                => '0.32',
     'Carp'                      => 0,
     'Compress::Zlib'            => 0,
+    'Dist::Metadata'            => '0.911',
     'Env'                       => 0,
     'File::Basename'            => 0,
     'File::Copy'                => 0,
