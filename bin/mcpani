@@ -89,82 +89,6 @@ sub inject {
   $mcpi->inject( $options{verbose} );
 }
 
-sub _load_meta {
-  my $filename = shift;
-
-  print "Loading META.yml from $options{file}\n"
-   if ( $options{verbose} );
-  my $tar = Archive::Tar->new();
-  $tar->read( $filename );
-
-  my $meta_filename;
-
-  FILE_LIST:
-  for my $name ( $tar->list_files() ) {
-    if ( $name =~ /META\.yml$/ ) {
-      $meta_filename = $name;
-      last FILE_LIST;
-    }
-  }
-
-  if ( $meta_filename ) {
-    return Load( $tar->get_content( $meta_filename ) );
-  }
-
-  warn( "Could not load the META.yml from file $options{file}" );
-  return {};
-
-}
-
-sub _find_provides {
-  my $filename = shift;
-
-  my %provides;
-
-  print "Parsing *.pm from $options{file}\n"
-   if ( $options{verbose} );
-
-  my $tar = Archive::Tar->new();
-  $tar->read( $filename );
-
-  my $meta_filename;
-
-  # loop through *.pm files in the tarball
-  for my $pm_filename ( $tar->list_files() ) {
-    next if $pm_filename !~ m/\.pm$/;  # only Perl module files are interesting
-
-    next if $pm_filename =~ m{
-      ^[^/]+/            # root tar directory (usually same as dist name)
-      (t|inc)/           # ignore test and inc directories
-    }x;
-
-    # write current .pm file to temp file
-    my $tmp_filename = File::Temp->new( UNLINK => 1 )->filename;
-    write_file($tmp_filename, $tar->get_content( $pm_filename ));
-
-    # get module info
-    my $info = eval { Module::Build::ModuleInfo->new_from_file($tmp_filename) };
-    print 'failed to get module info of "'.$pm_filename.'" - "'.$@.'"'
-      if $@ and $options{verbose};
-    next if not $info;
-
-    foreach my $package (keys %{$info->{'versions'}}) {
-      next if $package eq 'main';
-
-      # set version to undef
-      my $version = (
-        $info->{'versions'}->{$package}
-        ? $info->{'versions'}->{$package}->stringify
-        : 0
-      );
-
-      $provides{$package} = $version;
-    }
-  }
-
-  return \%provides;
-}
-
 # MAIN
 Getopt::Long::Configure( 'no_ignore_case' );
 Getopt::Long::Configure( 'bundling' );
@@ -220,8 +144,6 @@ Commands:
           --module      Name of the module to add
           --authorid    Author ID of the module
           --modversion  Version number of the module
-          --all-in-meta parse all modules in the META.yml
-          --discover-packages discover modules in all .pm files
           --file        tar.gz file of the module
 
     --update            Update local CPAN mirror and inject modules
@@ -265,15 +187,10 @@ file name.
 
 =item --all-in-meta
 
-This option will add every module listed in the 'provides' section of
-the META.yml contained in the tar.gz provided by the --file option.
+=item --discover-packages
 
-The options --module and --modversion are still recognized.  If the
-same module/version is found in the META.yml it is not duplicated.
-
-If the META.yml file or the 'provides' section is missing, then
-a warning is issued and the only module added is the one provided by
---module / --modversion.
+L<CPAN::Mini::Inject/add> adds all modules found in the file.
+These options remain for backward compatibility and do nothing.
 
 =item --file
 
