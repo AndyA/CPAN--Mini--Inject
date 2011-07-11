@@ -254,17 +254,21 @@ structure below the repository.
 
 =item * module
 
-The name of the module to add.
+Either the name of a single module as a string (e.g 'Foo::Bar') or a
+reference to a hash of NAME => VERSION pairs (e.g. {Foo::Bar => '1.2',
+Foo::Baz => '2.3'}).  In the former case, the C<version> argument is
+always required (see below).  In the latter case, the version numbers
+are optional and the default is taken from the C<version> argument
+(see below).
 
 =item * version
 
-The modules version number.
-
-=item * modules
-
-A reference to a hash of ModuleName => ModuleVersion pairs.  This can
-be used in place of the single C<module> amd <version> arguments when
-you have a distribution that contains multiple modules.
+The default version number of all added modules.  This is always
+required when the C<module> argument is just the name of a single
+module.  When the C<module> argument is a hashref of NAME => VERSION
+pairs, the C<version> arguemnt is optional and is used as the default
+version for all modules that don't have a defined VERSION in that
+hashref.
 
 =item * authorid
 
@@ -278,20 +282,31 @@ The tar.gz of the module.
 
 =head3 Example, with a distribution that contains only one module:
 
-  add( module => 'Module::Name',
+  add( module   => 'Module::Name',
        authorid => 'AUTHOR',
-       version => 0.01,
-       file => './Module-Name-0.01.tar.gz' );
+       version  => 0.01,
+       file     => './Module-Name-0.01.tar.gz' );
 
-=head3 Example, with a distribution that contains multiple modules:
+=head3 Example, with a distribution that contains multiple modules with different versions:
 
-  add( modules  => {
+  add( module   => {
                      Animal        => '0.1',
                      Animal::Bear  => '1.2',
                      Animal::Zebra => '2.6',
                    },
        authorid => 'AUTHOR',
-       file => './Zoo-3.2.tar.gz' );
+       file     => './Zoo-3.2.tar.gz' );
+
+=head3 Example, with a distribution that contains multiple modules, all with the same version:
+
+  add( module  => {
+                     Animal        => undef,
+                     Animal::Bear  => undef,
+                     Animal::Zebra => undef,
+                   },
+       authorid => 'AUTHOR',
+       version  => '2.3',
+       file     => './Zoo-3.2.tar.gz' );
 
 =cut
 
@@ -304,8 +319,13 @@ sub add {
   my $modulepath = $options{file};
   my $modulefile = basename $options{file};
   my $authorid   = uc $options{authorid};
-  my $defaultversion  = defined $options{version} ? $options{version} : 'undef';
-  my $modules    = $options{modules} || { $options{module} => $defaultversion };
+
+  my $defaultversion  = defined $options{version} ?
+      $options{version} : 'undef';
+
+  my $modules    = ref $options{module} eq 'HASH' ?
+      $options{module}  : { $options{module} => $defaultversion };
+
   my $repository = $self->config->get( 'repository' );
 
   croak "No repository configured"
@@ -540,23 +560,29 @@ sub _optionchk {
 
   # TODO: Don't call them "options" if they are required!
 
-  my @missing_options = grep { not $options{$_} } qw(authorid file);
+  my @missing_options = grep { not $options{$_} } qw(authorid file module);
   croak "Required option not specified: " . join ' ', @missing_options
       if @missing_options;
 
-  my ($mod, $ver, $mods) = @options{qw(module version modules)};
+  my ($mod, $ver) = @options{qw(module version)};
 
-  croak "Must specify either 'modules' or 'module')"
-      unless ( $mod xor $mods );
 
-  croak "Must specify 'version' with 'module')"
-      if ( $mod and not $ver );
 
-  croak "The 'modules' argument must be a hashref"
-      if ($mods and ref $mods ne 'HASH');
+  if (ref $mod eq '') {
 
-  croak "Must specify 'version' if 'modules' does not contain a version for each module"
-      if ( not $ver and grep { not $mods->{$_} } keys %$mods );
+    croak "The 'version' argument must be given when 'module' is a string"
+      if not $ver;
+  }
+  elsif (ref $mod eq 'HASH') {
+
+    croak "Must specify 'version' if 'module' does not contain a version for each module"
+      if ( not $ver and grep { not $mod->{$_} } keys %$mod );
+  }
+  else {
+
+    croak "The 'module' argument must be a string or hashref";
+  }
+
 }
 
 sub _make_path {
