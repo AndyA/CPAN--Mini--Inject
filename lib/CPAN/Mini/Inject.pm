@@ -299,7 +299,7 @@ sub add {
   my $self    = shift;
   my %options = @_;
 
-  _add_optionchk( %options );  # Croaks if invalid!
+  _optionchk( %options );  # Croaks if invalid!
 
   my $modulepath = $options{file};
   my $modulefile = basename $options{file};
@@ -529,7 +529,7 @@ sub _updperms {
    if $self->config->get( 'dirmode' );
 }
 
-sub _add_optionchk {
+sub _optionchk {
   my ( %options ) = @_;
 
   my @missing_options = grep { not $options{$_} } qw(authorid file);
