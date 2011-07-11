@@ -41,7 +41,13 @@ probably want to look at the mcpani command instead.
     $mcpi->add( module   => 'CPAN::Mini::Inject',
                 authorid => 'SSORICHE',
                 version  => ' 0.01',
-                file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
+                file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' );
+
+    # or...
+
+    $mcpi->add( modules  => { Foo::Bar => '0.01', Foo::Baz => '0.03' },
+                authorid => 'SSORICHE',
+                file     => 'mymodules/Distro-With-Many-Modules-1.2.tar.gz' );
 
     $mcpi->writelist;
     $mcpi->update_mirror;
@@ -250,13 +256,19 @@ structure below the repository.
 
 The name of the module to add.
 
-=item * authorid
-
-CPAN author id. This does not have to be a real author id.
-
 =item * version
 
 The modules version number.
+
+=item * modules
+
+A reference to a hash of ModuleName => ModuleVersion pairs.  This can
+be used in place of the single C<module> amd <version> arguments when
+you have a distribution that contains multiple modules.
+
+=item * authorid
+
+CPAN author id. This does not have to be a real author id.
 
 =item * file
 
@@ -264,12 +276,22 @@ The tar.gz of the module.
 
 =back
 
-=head3 Example
+=head3 Example, with a distribution that contains only one module:
 
   add( module => 'Module::Name',
        authorid => 'AUTHOR',
        version => 0.01,
        file => './Module-Name-0.01.tar.gz' );
+
+=head3 Example, with a distribution that contains multiple modules:
+
+  add( modules  => {
+                     Animal        => '0.1',
+                     Animal::Bear  => '1.2',
+                     Animal::Zebra => '2.6',
+                   },
+       authorid => 'AUTHOR',
+       file => './Zoo-3.2.tar.gz' );
 
 =cut
 
@@ -277,48 +299,51 @@ sub add {
   my $self    = shift;
   my %options = @_;
 
-  my $optionchk
-   = _optionchk( \%options, qw/module authorid version file/ );
+  _optionchk( %options );  # Croaks if invalid!
 
-  croak "Required option not specified: $optionchk" if $optionchk;
+  my $modulepath = $options{file};
+  my $modulefile = basename $options{file};
+  my $authorid   = uc $options{authorid};
+  my $modules    = $options{modules} || { $options{module} => $options{version} };
+  my $repository = $self->config->get( 'repository' );
+
   croak "No repository configured"
-   unless ( $self->config->get( 'repository' ) );
-  croak "Can not write to repository: "
-   . $self->config->get( 'repository' )
-   unless ( -w $self->config->get( 'repository' ) );
+    unless ( $repository );
+
+  croak "Can not write to repository: $repository"
+    unless ( -w $repository );
 
   croak "Can not read module file: $options{file}"
-   unless -r $options{file};
+    unless -r $options{file};
 
-  my $modulefile = basename( $options{file} );
   $self->readlist unless exists( $self->{modulelist} );
 
-  $options{authorid} = uc( $options{authorid} );
-  $self->{authdir} = $self->_authordir( $options{authorid},
-    $self->config->get( 'repository' ) );
+  $self->{authdir} = $self->_authordir( $authorid, $repository );
 
   my $target
-   = $self->config->get( 'repository' )
+   = $repository
    . '/authors/id/'
    . $self->{authdir} . '/'
-   . basename( $options{file} );
+   . $modulefile;
 
-  copy( $options{file}, dirname( $target ) )
+  copy( $modulepath, dirname( $target ) )
    or croak "Copy failed: $!";
 
   $self->_updperms( $target );
 
-  # remove old version from the list
-  @{ $self->{modulelist} }
-   = grep { $_ !~ m/\A$options{module}\s+/ } @{ $self->{modulelist} };
+  while (my ($modulename, $version) = each %$modules) {
 
-  push(
-    @{ $self->{modulelist} },
-    _fmtmodule(
-      $options{module}, File::Spec::Unix->catfile( File::Spec->splitdir( $self->{authdir} ), $modulefile ),
-      $options{version}
-    )
-  );
+      # remove old version from the list
+      @{ $self->{modulelist} }
+          = grep { $_ !~ m/\A$modulename\s+/ } @{ $self->{modulelist} };
+
+      push(
+          @{ $self->{modulelist} },
+          _fmtmodule($modulename,
+                     File::Spec::Unix->catfile(File::Spec->splitdir( $self->{authdir} ), $modulefile ),
+                     $version )
+      );
+  }
 
   return $self;
 }
@@ -505,15 +530,24 @@ sub _updperms {
 }
 
 sub _optionchk {
-  my ( $options, @list ) = @_;
-  my @missing;
+  my ( %options ) = @_;
 
-  for my $option ( @list ) {
-    push @missing, $option
-     unless defined $$options{$option};
-  }
+  my @missing_options = grep { not $options{$_} } qw(authorid file);
+  croak "Required option not specified: " . join ' ', @missing_options
+      if @missing_options;
 
-  return join ' ', @missing;
+  my ($mod, $ver, $mods) = @options{qw(module version modules)};
+
+  croak "Must specify either 'modules' or ('module' and 'version')"
+      unless ( ($mod and $ver) or ($mods and not ($mod or $ver)) );
+
+  croak "The modules argument must be a hashref"
+      if $mods and ref $mods ne 'HASH';
+
+  my @no_version = grep { not defined $mods->{$_} } keys %$mods;
+  croak "Version number required for modules: ", join ' ', @no_version
+      if @no_version;
+
 }
 
 sub _make_path {
