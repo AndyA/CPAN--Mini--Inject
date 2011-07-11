@@ -39,30 +39,30 @@ my @modules = (
 );
 
 for my $module (@modules) {
-    ok( grep( /$module/, @{ $mcpi->{modulelist} } ), "Module added to list" );
+    ok( grep( /$module/, @{ $mcpi->{modulelist} } ), "Module $module added to list" );
 }
 
 is( grep( /^CPAN::Mini::Inject\s+/, @{ $mcpi->{modulelist} } ),
   1, 'Module added to list just once' );
 
 # Test argument validation on add() method
-dies_ok  {$mcpi->add( authorid => 'AUTHOR', modules => {}) }
-    'Missing file argument';
+throws_ok  {$mcpi->add( authorid => 'AUTHOR', modules => {}) }
+          qr/Required option not specified: file/, 'Missing file argument';
 
-dies_ok {$mcpi->add( file => 'My-Modules-1.0.tar.gz', modules => {}) }
-    'Missing authorid argument';
+throws_ok {$mcpi->add( file => 'My-Modules-1.0.tar.gz', modules => {}) }
+          qr/Required option not specified: authorid/, 'Missing authorid argument';
 
-dies_ok {$mcpi->add( authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-    'Missing both module and modules argument';
+throws_ok {$mcpi->add( authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
+          qr/Must specify either/, 'Missing module and modules argument',;
 
-dies_ok {$mcpi->add( modules => {}, module => 'FOO', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-    'Both module and modules argument given';
+throws_ok {$mcpi->add( modules => {}, module => 'FOO', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
+          qr/Must specify either/, 'Both module and modules argument given';
 
-dies_ok {$mcpi->add( modules => {}, version => '1.0', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-    'Both modules and version argument given';
+throws_ok {$mcpi->add( modules => {}, version => '1.0', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
+          qr/Must specify either/, 'Both modules and version argument given';
 
-dies_ok {$mcpi->add( modules => {Foo => undef}, authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-    'Missing version number for a module';
+throws_ok {$mcpi->add( modules => {Foo => undef}, authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
+          qr/Version number required for modules: Foo/, 'Missing version number for a module';
 
 SKIP: {
   skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin/ );

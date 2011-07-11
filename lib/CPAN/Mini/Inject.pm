@@ -537,8 +537,9 @@ sub _add_optionchk {
       if @missing_options;
 
   my ($mod, $ver, $mods) = @options{qw(module version modules)};
+
   croak "Must specify either 'modules' or ('module' and 'version')"
-      unless ( ($mod and $ver) or $mods);
+      unless ( ($mod and $ver) or ($mods and not ($mod or $ver)) );
 
   croak "The modules argument must be a hashref"
       if $mods and ref $mods ne 'HASH';
