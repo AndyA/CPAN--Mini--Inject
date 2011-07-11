@@ -294,7 +294,7 @@ mirror. The add command requires the following parameters:
 =item --module NAME
 
 This is the NAME and VERSION of the module to add.  This option can be
-repeated for multiple options.  If you do not specify a VERSION here,
+repeated for multiple modules.  If you do not specify a VERSION here,
 it will be taken from the C<--modversion> option.
 
 =item --modversion VERSION
