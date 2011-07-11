@@ -43,7 +43,7 @@ sub add {
 
   $mcpi->readlist;
 
-  my @modules_to_add;
+  my %modules_to_add;
   if ( $options{'all-in-meta'} ) {
     ## attempt to read the META.yml
     my $meta_data = _load_meta( $options{file} );
@@ -63,11 +63,7 @@ sub add {
        ? $info->{version}
        : 'undef';
 
-      push @modules_to_add,
-       {
-        version => $v,
-        module  => $name
-       };
+      $modules_to_add{$name} = $v;
     }
 
   }
@@ -78,39 +74,31 @@ sub add {
     my $provides = _find_provides( $options{file} );
 
     while ( my ( $module, $version ) = each( %{$provides} ) ) {
-      push @modules_to_add,
-       {
-        version => $version,
-        module  => $module
-       };
+      $modules_to_add{$module} = $version;
     }
   }
 
-  # always add the module/version provided on the command line
-  # as well
-  push @modules_to_add,
-   {
-    version => $options{version},
-    module  => $options{module},
-   };
+  # always add the module/version provided on the command line as well
+  $modules_to_add{$options{module}} = $options{version};
 
   $mcpi->readlist;
-  for my $item ( @modules_to_add ) {
-    $mcpi->add(
-      module   => $item->{module},
-      authorid => $options{authorid},
-      version  => $item->{version},
-      file     => $options{file}
-    );
+  $mcpi->add(
+    modules   => \%modules_to_add,
+    authorid  => $options{authorid},
+    file      => $options{file}
+  );
 
-    if ( $options{verbose} ) {
-      print "\nAdding module: $item->{module}\n";
-      print "Author ID: $options{authorid}\n";
-      print "Version: $item->{version}\n";
-      print "File: $options{file}\n";
-      print "To repository: $mcpi->{config}{repository}\n\n";
+  if ( $options{verbose} ) {
+    local $, = ' ';
+    my @modules = sort keys %modules_to_add;
+    my @versions = @modules_to_add{@modules};
+    print "\nAdding module(s): @modules\n";
+    print "Author ID: $options{authorid}\n";
+    print "Version(s): @versions\n";
+    print "File: $options{file}\n";
+    print "To repository: $mcpi->{config}{repository}\n\n";
     }
-  }
+
   $mcpi->writelist;
 
 }
@@ -234,9 +222,8 @@ GetOptions(
   'update'       => sub { setsub( 'update', \&update ) },
   'mirror'       => sub { setsub( 'mirror', \&mirror ) },
   'inject'       => sub { setsub( 'inject', \&inject ) },
-  'module=s'     => \$options{module},
+  'module:s%'     => \$options{module},
   'authorid=s'   => \$options{authorid},
-  'modversion=s' => \$options{version},
   'file=s'       => \$options{file},
   'all-in-meta'  => \$options{'all-in-meta'},
   'signing-key=s' => \$options{'signing_key'},
@@ -267,29 +254,30 @@ mcpani [options] < --add | --update | --mirror | --inject >
 
 Commands:
 
-    --add               Add a new package to the repository
-          --module      Name of the module to add
-          --authorid    Author ID of the module
-          --modversion  Version number of the module
-          --all-in-meta parse all modules in the META.yml
-          --discover-packages discover modules in all .pm files
-          --file        tar.gz file of the module
+    --add                          Add a new module to the repository
 
-    --update            Update local CPAN mirror and inject modules
-    --mirror            Update local CPAN mirror from remote
-    --inject            Add modules from repository to CPAN mirror
+          --module NAME=VERSION    Explicit NAME and VERSION of the module to add (repeatable)
+          --modversion VERSION     Default VERSION for all modules
+          --authorid ID            Author ID of the module
+          --all-in-meta            Get module names and versions from the META.yml
+          --discover-packages      Discover modules from all the .pm files
+          --file FILE              path to tar.gz file containing the module(s)
+
+    --update                       Update local CPAN mirror and inject modules
+    --mirror                       Update local CPAN mirror from remote
+    --inject                       Add modules from repository to CPAN mirror
 
 Options:
 
-    -h, --help          This synopsis
-    -H, --man           Detailed description
+    -h, --help                     This synopsis
+    -H, --man                      Detailed description
 
-    -l, --local         local location for CPAN::Mini Mirror
-    -r, --remote        CPAN mirror to mirror from
-    -p, --passive       Enable passive ftp for mirroring.
-    -v, --verbose       verbose output
-    -V, --version       Version information.
-        --signing-key   See CPAN::Checksums $SIGNING_KEY
+    -l, --local                    local location for CPAN::Mini Mirror
+    -r, --remote                   CPAN mirror to mirror from
+    -p, --passive                  Enable passive ftp for mirroring.
+    -v, --verbose                  Verbose output
+    -V, --version                  Version information.
+        --signing-key              See CPAN::Checksums $SIGNING_KEY
 
 =head1 COMMAND LINE OPTIONS
 
@@ -300,31 +288,44 @@ mirror. The add command requires the following parameters:
 
 =over 4
 
-=item --module
+=item --module NAME=VERSION
 
-This is the name of the module (ie CPAN::Mini::Inject).
+=item --module NAME
+
+This is the NAME and VERSION of the module to add.  This option can be
+repeated for multiple options.  If you do not specify a VERSION here,
+it will be taken from the C<--modversion> option.
+
+=item --modversion VERSION
+
+This is the default VERSION for all modules.  This VERSION will be
+used for any module that was not explicity given a VERSION in the
+C<--module> option.
 
 =item --authorid
 
 A CPAN 'like' author ID for the module. The author ID does not need to
 exist on CPAN.
 
-=item --modversion
-
-Version number of the module. This must match the version number in the
-file name.
-
 =item --all-in-meta
 
 This option will add every module listed in the 'provides' section of
-the META.yml contained in the tar.gz provided by the --file option.
+the F<META.yml> contained in the tar.gz provided by the --file option.
 
-The options --module and --modversion are still recognized.  If the
-same module/version is found in the META.yml it is not duplicated.
+The options C<--module> and C<--modversion> are still recognized, and
+will override the values in the F<META.yml> file.
 
-If the META.yml file or the 'provides' section is missing, then
-a warning is issued and the only module added is the one provided by
---module / --modversion.
+If the F<META.yml> file or the 'provides' section is missing, then a
+warning is issued and the only modules added are those provided by
+C<--module> option(s).
+
+=item --discover-packages
+
+This option will attempt to discover the modules in your tar.gz
+by examining all the F<.pm> files in the F<lib/> directory.
+
+The options C<--module> and C<--modversion> are still recognized, and
+will override the values discovered in the F<.pm> files.
 
 =item --file
 
@@ -334,11 +335,20 @@ C<make tardist>).
 
 =back
 
-  Example:
+Example with a single module:
 
-  mcpani --add --module CPAN::Mini::Inject --authorid SSORICHE
-         --modversion 0.01 --file ./CPAN-Mini-Inject-0.01.tar.gz
+  mcpani --add --module Romeo --modversion 1.2 --authorid THEBARD
+         --file ./Romeo-Juliet-1.2.tar.gz
 
+Example with multiple modules, having different versions:
+
+  mcpani --add --module Montague=1.2 --module Capulet=2.4  --author THEBARD
+         --file ./Romeo-Juliet-3.2.tar.gz
+
+Example with muliple modules, using a default version for all:
+
+  mcpani --add --module Montague --module Capulet --modversion 3.2  --author THEBARD
+         --file ./Romeo-Juliet-3.2.tar.gz
 
 =head2 --update
 
