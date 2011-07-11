@@ -304,7 +304,8 @@ sub add {
   my $modulepath = $options{file};
   my $modulefile = basename $options{file};
   my $authorid   = uc $options{authorid};
-  my $modules    = $options{modules} || { $options{module} => $options{version} };
+  my $defaultversion  = defined $options{version} ? $options{version} : 'undef';
+  my $modules    = $options{modules} || { $options{module} => $defaultversion };
   my $repository = $self->config->get( 'repository' );
 
   croak "No repository configured"
@@ -331,7 +332,12 @@ sub add {
 
   $self->_updperms( $target );
 
-  while (my ($modulename, $version) = each %$modules) {
+  foreach my $modulename (sort keys %$modules) {
+
+      # Use default version if none given explicitly for this module
+      # Remember that versions can be zero too.
+      my $moduleversion = defined $modules->{$modulename} ?
+          $modules->{$modulename} : $defaultversion;
 
       # remove old version from the list
       @{ $self->{modulelist} }
@@ -341,7 +347,7 @@ sub add {
           @{ $self->{modulelist} },
           _fmtmodule($modulename,
                      File::Spec::Unix->catfile(File::Spec->splitdir( $self->{authdir} ), $modulefile ),
-                     $version )
+                     $moduleversion )
       );
   }
 
@@ -532,22 +538,25 @@ sub _updperms {
 sub _optionchk {
   my ( %options ) = @_;
 
+  # TODO: Don't call them "options" if they are required!
+
   my @missing_options = grep { not $options{$_} } qw(authorid file);
   croak "Required option not specified: " . join ' ', @missing_options
       if @missing_options;
 
   my ($mod, $ver, $mods) = @options{qw(module version modules)};
 
-  croak "Must specify either 'modules' or ('module' and 'version')"
-      unless ( ($mod and $ver) or ($mods and not ($mod or $ver)) );
+  croak "Must specify either 'modules' or 'module')"
+      unless ( $mod xor $mods );
 
-  croak "The modules argument must be a hashref"
-      if $mods and ref $mods ne 'HASH';
+  croak "Must specify 'version' with 'module')"
+      if ( $mod and not $ver );
 
-  my @no_version = grep { not defined $mods->{$_} } keys %$mods;
-  croak "Version number required for modules: ", join ' ', @no_version
-      if @no_version;
+  croak "The 'modules' argument must be a hashref"
+      if ($mods and ref $mods ne 'HASH');
 
+  croak "Must specify 'version' if 'modules' does not contain a version for each module"
+      if ( not $ver and grep { not $mods->{$_} } keys %$mods );
 }
 
 sub _make_path {

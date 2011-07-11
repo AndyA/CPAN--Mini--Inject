@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 17;
 use Test::Exception;
 
 use CPAN::Mini::Inject;
@@ -21,8 +21,15 @@ $mcpi->add(
   version  => '0.02',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
  )->add(
+  # Injecting multiple modules, with different versions
   modules  => {Foo => '1.0', Bar => '2.0'},
   authorid => 'SSORICHE',
+  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+)->add(
+  # Injecting multiple modules, with different versions, and a default version
+  modules  => {Fred => '0.0', Wilma => undef, Barney => '1.2'},
+  authorid => 'SSORICHE',
+  version  => '4.0',
   file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
 );
 
@@ -34,12 +41,15 @@ ok(
 );
 my @modules = (
    'CPAN::Mini::Inject                 0.02  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
-   'Foo                                 1.0  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
    'Bar                                 2.0  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
+   'Foo                                 1.0  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
+   'Barney                              1.2  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
+   'Fred                                0.0  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
+   'Wilma                               4.0  S/SS/SSORICHE/CPAN-Mini-Inject-0.01.tar.gz',
 );
 
 for my $module (@modules) {
-    ok( grep( /$module/, @{ $mcpi->{modulelist} } ), "Module $module added to list" );
+    ok( grep( /$module/, @{ $mcpi->{modulelist} } ), "Added: $module" );
 }
 
 is( grep( /^CPAN::Mini::Inject\s+/, @{ $mcpi->{modulelist} } ),
@@ -53,16 +63,16 @@ throws_ok {$mcpi->add( file => 'My-Modules-1.0.tar.gz', modules => {}) }
           qr/Required option not specified: authorid/, 'Missing authorid argument';
 
 throws_ok {$mcpi->add( authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-          qr/Must specify either/, 'Missing module and modules argument',;
+          qr/Must specify either/, 'Missing module and modules argument';
 
 throws_ok {$mcpi->add( modules => {}, module => 'FOO', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
           qr/Must specify either/, 'Both module and modules argument given';
 
-throws_ok {$mcpi->add( modules => {}, version => '1.0', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-          qr/Must specify either/, 'Both modules and version argument given';
+throws_ok {$mcpi->add( modules => 'string', authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
+          qr/must be a hashref/, 'The modules argument is not a hashref';
 
 throws_ok {$mcpi->add( modules => {Foo => undef}, authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
-          qr/Version number required for modules: Foo/, 'Missing version number for a module';
+          qr/Must specify 'version'/, 'No default version, when explicit version is not given';
 
 SKIP: {
   skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin/ );
