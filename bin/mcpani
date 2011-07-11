@@ -79,11 +79,12 @@ sub add {
   }
 
   # always add the module/version provided on the command line as well
-  $modules_to_add{$options{module}} = $options{version};
+  $modules_to_add{$options{module}} = $options{version} if $options{module};
 
   $mcpi->readlist;
   $mcpi->add(
     modules   => \%modules_to_add,
+    version   => $options{version},
     authorid  => $options{authorid},
     file      => $options{file}
   );
