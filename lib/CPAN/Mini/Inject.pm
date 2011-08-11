@@ -56,9 +56,15 @@ probably want to look at the mcpani command instead.
 
 =head1 DESCRIPTION
 
-CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
-then adds modules from your repository to it, allowing the inclusion
-of private modules in a minimal CPAN mirror.
+CPAN::Mini::Inject uses CPAN::Mini to build or update a I<local> CPAN mirror
+from a I<remote> one.  It adds two extra features:
+
+1. an additional I<repository> of distribution files and related information
+(author and module versions), separate from the local and remote mirrors, to
+which you can add your own distribution files.
+
+2. the ability to I<inject> the distribution files from your I<repository>
+into a I<local> CPAN mirror.
 
 =head1 METHODS
 
