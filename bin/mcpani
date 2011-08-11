@@ -280,11 +280,23 @@ Options:
     -V, --version                  Version information.
         --signing-key              See CPAN::Checksums $SIGNING_KEY
 
+=head1 DESCRIPTION
+
+mcpani uses CPAN::Mini to build or update a I<local> CPAN mirror from a
+I<remote> one.  It adds two extra features:
+
+1. an additional I<repository> of distribution files and related information
+(author and module versions), separate from the local and remote mirrors, to
+which you can add your own distribution files.
+
+2. the ability to I<inject> the distribution files from your I<repository>
+into a I<local> CPAN mirror.
+
 =head1 COMMAND LINE OPTIONS
 
 =head2 --add
 
-Add a module to the repository for later inclusion in the CPAN Mini
+Add a module to the repository for later inclusion in a CPAN Mini
 mirror. The add command requires the following parameters:
 
 =over 4

@@ -1,4 +1,4 @@
-use Test::More tests => 17;
+use Test::More tests => 18;
 use Test::Exception;
 
 use CPAN::Mini::Inject;
@@ -19,7 +19,7 @@ $mcpi->add(
   module   => 'CPAN::Mini::Inject',
   authorid => 'SSORICHE',
   version  => '0.02',
-  file     => 't/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
+  file     => 'file:t/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz'
  )->add(
   # Injecting multiple modules, with different versions
   module   => {Foo => '1.0', Bar => '2.0'},
@@ -73,6 +73,9 @@ throws_ok {$mcpi->add( module => [], authorid => 'AUTHOR', file => 'My-Modules-1
 
 throws_ok {$mcpi->add( module => {Foo => undef}, authorid => 'AUTHOR', file => 'My-Modules-1.0.tar.gz') }
           qr/Must specify 'version'/, 'No default version and no explicit version either';
+
+throws_ok {$mcpi->add( module => {Foo => 1}, authorid => 'AUTHOR', file => 'None-Such-0.0.tar.gz') }
+          qr/Copy failed: Not Found/, 'file not found';
 
 SKIP: {
   skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin/ );

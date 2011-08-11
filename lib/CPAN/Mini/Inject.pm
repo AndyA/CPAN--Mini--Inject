@@ -14,6 +14,7 @@ use File::Copy;
 use File::Path qw( make_path );
 use File::Spec;
 use LWP::Simple;
+use URI;
 
 =head1 NAME
 
@@ -55,9 +56,15 @@ probably want to look at the mcpani command instead.
 
 =head1 DESCRIPTION
 
-CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
-then adds modules from your repository to it, allowing the inclusion
-of private modules in a minimal CPAN mirror.
+CPAN::Mini::Inject uses CPAN::Mini to build or update a I<local> CPAN mirror
+from a I<remote> one.  It adds two extra features:
+
+1. an additional I<repository> of distribution files and related information
+(author and module versions), separate from the local and remote mirrors, to
+which you can add your own distribution files.
+
+2. the ability to I<inject> the distribution files from your I<repository>
+into a I<local> CPAN mirror.
 
 =head1 METHODS
 
@@ -276,7 +283,7 @@ CPAN author id. This does not have to be a real author id.
 
 =item * file
 
-The tar.gz of the module.
+The tar.gz of the module. Can also be a URL.
 
 =back
 
@@ -316,8 +323,8 @@ sub add {
 
   _optionchk( %options );  # Croaks if invalid!
 
-  my $modulepath = $options{file};
-  my $modulefile = basename $options{file};
+  my $file_uri = URI->new($options{file} =~ m/^\w+:/ ? $options{file} : "file:$options{file}");
+  my $modulefile = basename $file_uri->path;
   my $authorid   = uc $options{authorid};
 
   my $defaultversion  = defined $options{version} ?
@@ -334,9 +341,6 @@ sub add {
   croak "Can not write to repository: $repository"
     unless ( -w $repository );
 
-  croak "Can not read module file: $options{file}"
-    unless -r $options{file};
-
   $self->readlist unless exists( $self->{modulelist} );
 
   $self->{authdir} = $self->_authordir( $authorid, $repository );
@@ -347,8 +351,10 @@ sub add {
    . $self->{authdir} . '/'
    . $modulefile;
 
-  copy( $modulepath, dirname( $target ) )
-   or croak "Copy failed: $!";
+  my $copy_status = mirror( $file_uri, $target );
+  if (is_error($copy_status)) {
+    croak "Copy failed: ".status_message($copy_status);
+  }
 
   $self->_updperms( $target );
 
