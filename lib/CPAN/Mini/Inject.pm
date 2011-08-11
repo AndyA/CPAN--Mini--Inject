@@ -14,6 +14,7 @@ use File::Copy;
 use File::Path qw( make_path );
 use File::Spec;
 use LWP::Simple;
+use URI;
 
 =head1 NAME
 
@@ -276,7 +277,7 @@ CPAN author id. This does not have to be a real author id.
 
 =item * file
 
-The tar.gz of the module.
+The tar.gz of the module. Can also be a URL.
 
 =back
 
@@ -316,8 +317,8 @@ sub add {
 
   _optionchk( %options );  # Croaks if invalid!
 
-  my $modulepath = $options{file};
-  my $modulefile = basename $options{file};
+  my $file_uri = URI->new($options{file} =~ m/^\w+:/ ? $options{file} : "file:$options{file}");
+  my $modulefile = basename $file_uri->path;
   my $authorid   = uc $options{authorid};
 
   my $defaultversion  = defined $options{version} ?
@@ -347,8 +348,10 @@ sub add {
    . $self->{authdir} . '/'
    . $modulefile;
 
-  copy( $modulepath, dirname( $target ) )
-   or croak "Copy failed: $!";
+  my $copy_status = mirror( $file_uri, $target );
+  if (is_error($copy_status)) {
+    croak "Copy failed: ".status_message($copy_status);
+  }
 
   $self->_updperms( $target );
 
