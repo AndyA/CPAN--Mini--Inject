@@ -335,9 +335,6 @@ sub add {
   croak "Can not write to repository: $repository"
     unless ( -w $repository );
 
-  croak "Can not read module file: $options{file}"
-    unless -r $options{file};
-
   $self->readlist unless exists( $self->{modulelist} );
 
   $self->{authdir} = $self->_authordir( $authorid, $repository );
