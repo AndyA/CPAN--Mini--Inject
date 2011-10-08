@@ -3,7 +3,7 @@
 use strict;
 use Pod::Usage 1.12;
 use Getopt::Long;
-use YAML qw( Load );
+use CPAN::Meta::YAML;
 use Archive::Tar;
 use CPAN::Mini::Inject;
 use Env;
@@ -50,14 +50,14 @@ sub add {
 
     my $provides = $meta_data->{provides} || {};
 
-    if ( !$provides ) {
+    if ( not keys %{$provides} ) {
       warn("Could not find the 'provides' section in META.yml. "
          . "Only adding based on provided command line.\n" );
     }
 
     PROVIDE_ENTRY:
     while ( my ( $name, $info ) = each( %{$provides} ) ) {
-      next PROVIDE_ENTRY if $name eq $options{module};
+      next PROVIDE_ENTRY if $options{module} and $name eq $options{module};
       my $v
        = defined $info->{version}
        ? $info->{version}
@@ -163,7 +163,8 @@ sub _load_meta {
   }
 
   if ( $meta_filename ) {
-    return Load( $tar->get_content( $meta_filename ) );
+    my $yaml = CPAN::Meta::YAML->read_string( $tar->get_content( $meta_filename ) );
+    return $yaml->[0];
   }
 
   warn( "Could not load the META.yml from file $options{file}" );
