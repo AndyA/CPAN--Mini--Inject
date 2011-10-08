@@ -88,14 +88,16 @@ sub add {
 
   # always add the module/version provided on the command line
   # as well
-  push @modules_to_add,
-   {
-    version => $options{version},
-    module  => $options{module},
-   };
+  if ( defined $options{module} and defined $options{version} ) {
+    push @modules_to_add,
+     {
+      version => $options{version},
+      module  => $options{module},
+     };
+  }
 
   $mcpi->readlist;
-  for my $item ( @modules_to_add ) {
+  foreach my $item ( @modules_to_add ) {
     $mcpi->add(
       module   => $item->{module},
       authorid => $options{authorid},
