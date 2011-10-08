@@ -57,7 +57,7 @@ sub add {
 
     PROVIDE_ENTRY:
     while ( my ( $name, $info ) = each( %{$provides} ) ) {
-      next PROVIDE_ENTRY if $name eq $options{module};
+      next PROVIDE_ENTRY if $options{module} and $name eq $options{module};
       my $v
        = defined $info->{version}
        ? $info->{version}
