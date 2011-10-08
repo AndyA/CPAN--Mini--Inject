@@ -50,7 +50,7 @@ sub add {
 
     my $provides = $meta_data->{provides} || {};
 
-    if ( !$provides ) {
+    if ( not keys %{$provides} ) {
       warn("Could not find the 'provides' section in META.yml. "
          . "Only adding based on provided command line.\n" );
     }
