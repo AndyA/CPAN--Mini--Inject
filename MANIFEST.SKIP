@@ -41,6 +41,7 @@
 \bblibdirs\.ts$         # 6.18 through 6.25 generated this
 # Avoid Module::Build generated and utility files.
 \bBuild$
+\bBuild.bat$
 \b_build/
 # Avoid temp and backup files.
 \.old$
@@ -49,3 +50,8 @@
 # Avoid Devel::Cover files.
 \bcover_db\b
 ^MYMETA.yml$
+^MYMETA\.json$
+^CPAN-Mini-Inject-.*\.tar\.gz
+pod2ht.*\.tmp
+t/local/MYCPAN
+t/local/WRITEREPO

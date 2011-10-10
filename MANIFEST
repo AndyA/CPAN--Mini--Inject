@@ -5,6 +5,7 @@ inc/MyBuilder.pm
 lib/CPAN/Mini/Inject.pm
 lib/CPAN/Mini/Inject/Config.pm
 MANIFEST
+META.json
 META.yml
 README
 t/.mcpani/config
@@ -15,6 +16,7 @@ t/.mcpani/config_noread
 t/.mcpani/config_norepo
 t/.mcpani/config_nowrite
 t/00.load.t
+t/add-multiple.t
 t/add.t
 t/html/01mailrc.txt.gz
 t/html/02packages.details.txt.gz
@@ -31,6 +33,9 @@ t/local/01mailrc.txt.gz.original
 t/local/CPAN/modules/02packages.details.txt.gz.original
 t/local/mymodules/CPAN-Mini-0.17.tar.gz
 t/local/mymodules/CPAN-Mini-Inject-0.01.tar.gz
+t/local/mymodules/Dist-Metadata-Test-MetaFile-2.2.tar.gz
+t/local/mymodules/Dist-Metadata-Test-MetaFile-Only.tar.gz
+t/local/mymodules/not-discoverable.tar.gz
 t/new.t
 t/parsecfg.t
 t/pod-coverage.t
@@ -44,4 +49,3 @@ t/testremote.t
 t/update_mirror.t
 t/writelist.t
 t/zz.exceptions.t
-META.json

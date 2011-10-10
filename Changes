@@ -1,5 +1,10 @@
 Revision history for CPAN-Mini-Inject
 
+0.31    2011/10/10
+        Randy Stauner <rwstauner@cpan.org>:
+        - outsource module discovery to Dist::Metadata
+        - moved module discovery from script to CPAN::Mini::Inject
+
 0.30    2011/06/13
         - keep just the last added module, even if there was one in
           02packages.details.txt before we injected
