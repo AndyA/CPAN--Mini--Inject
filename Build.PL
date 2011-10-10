@@ -13,7 +13,7 @@ my $builder = MyBuilder->new(
   dist_author       => [
     'Shawn Sorichetti <ssoriche@coloredblocks.net>',
     'Andy Armstrong <andy@hexten.net>',
-    'Christian Walde <walde.christian@googlemail.com',
+    'Christian Walde <walde.christian@googlemail.com>',
   ],
   dist_version_from => 'lib/CPAN/Mini/Inject.pm',
   requires          => {
