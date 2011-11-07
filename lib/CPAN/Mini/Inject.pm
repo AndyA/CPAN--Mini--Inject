@@ -416,7 +416,7 @@ sub inject {
      or croak "Copy $source to $tdir failed: $!";
 
     $self->_updperms( $target );
-    print "$target ... injected\n" if $verbose;
+    print "$target ... injected $module\n" if $verbose;
   }
 
   for my $dir ( keys( %updatedir ) ) {
