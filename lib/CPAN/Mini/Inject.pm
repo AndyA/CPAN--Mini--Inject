@@ -32,7 +32,7 @@ our @ISA     = qw( CPAN::Mini );
 =head1 Synopsis
 
 If you're not going to customize the way CPAN::Mini::Inject works you
-probably want to look at the mcpani command instead.
+probably want to look at the L<mcpani> command instead.
 
     use CPAN::Mini::Inject;
 
