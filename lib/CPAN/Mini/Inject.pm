@@ -22,11 +22,11 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
@@ -402,8 +402,12 @@ sub inject {
   $self->readlist unless ( exists( $self->{modulelist} ) );
 
   my %updatedir;
+  my %already_injected;
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
+
+    next if %already_injected{$file}++;
+
     my $target = $self->config->get( 'local' ) . '/authors/id/' . $file;
     my $source
      = $self->config->get( 'repository' ) . '/authors/id/' . $file;
