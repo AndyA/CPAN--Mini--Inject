@@ -1,5 +1,8 @@
 Revision history for CPAN-Mini-Inject
 
+        Salve J. Nilsen <sjn@cpan.org>:
+        - Inject distributions once per file instead of once per module
+
 0.31    2011/10/10
         Randy Stauner <rwstauner@cpan.org>:
         - outsource module discovery to Dist::Metadata

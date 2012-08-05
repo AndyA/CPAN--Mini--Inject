@@ -402,8 +402,12 @@ sub inject {
   $self->readlist unless ( exists( $self->{modulelist} ) );
 
   my %updatedir;
+  my %already_injected;
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
+
+    next if $already_injected{$file}++;
+
     my $target = $self->config->get( 'local' ) . '/authors/id/' . $file;
     my $source
      = $self->config->get( 'repository' ) . '/authors/id/' . $file;
