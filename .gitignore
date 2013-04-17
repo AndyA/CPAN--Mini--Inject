@@ -2,7 +2,7 @@
 .lwpcookies
 .prove
 Build
-META.yml
+META.*
 Makefile
 Makefile.old
 Session.vim
@@ -15,3 +15,4 @@ pm_to_blib*
 *.bak
 t/local/WRITEREPO
 MYMETA.*
+Build.bat

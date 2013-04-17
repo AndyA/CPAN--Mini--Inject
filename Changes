@@ -1,5 +1,10 @@
 Revision history for CPAN-Mini-Inject
 
+0.32    2013/04/17
+        Karen Etheridge <ether@cpan.org>:
+        - add link for mcpani
+        Randy Stauner <rwstauner@cpan.org>:
+        - Add module name to verbose "injected" message
         Salve J. Nilsen <sjn@cpan.org>:
         - Inject distributions once per file instead of once per module
 
