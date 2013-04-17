@@ -402,6 +402,7 @@ sub inject {
   $self->readlist unless ( exists( $self->{modulelist} ) );
 
   my %updatedir;
+  my %copied;
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
     my $target = $self->config->get( 'local' ) . '/authors/id/' . $file;
@@ -412,8 +413,10 @@ sub inject {
 
     my $tdir = dirname $target;
     _make_path( $tdir, defined $dirmode ? { mode => $dirmode } : {} );
-    copy( $source, $tdir )
-     or croak "Copy $source to $tdir failed: $!";
+    if(!$copied{$file}++) {
+      copy( $source, $tdir )
+        or croak "Copy $source to $tdir failed: $!";
+    }
 
     $self->_updperms( $target );
     print "$target ... injected $module\n" if $verbose;
