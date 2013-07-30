@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+0.33    2013/07/30
+        Wolfgang Pecho <pecho@belwue.de>:
+        - allow spaces in configuration file
+
 0.32    2013/04/17
         Karen Etheridge <ether@cpan.org>:
         - add link for mcpani
