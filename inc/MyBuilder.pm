@@ -30,7 +30,7 @@ sub _auto_repository {
   }
   elsif ( -d '.git' ) {
     my $info = `git remote -v`;
-    return unless $info =~ /^origin\s+(.+)$/m;
+    return unless $info =~ /^origin\s+(.+)\s\(\w+\)$/m;
     my $url = $1;
     # Special case: patch up github URLs
     $url =~ s!^git\@github\.com:!git://github.com/!;
