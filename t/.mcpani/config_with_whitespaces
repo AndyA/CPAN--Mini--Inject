@@ -1,0 +1,6 @@
+  # all config lines with trailing whitespaces
+  local      :   t/local/CPAN    
+  remote     :  http://localhost:11027   
+  repository :  t/local/MYCPAN   
+  dirmode   :   0775  
+  passive    :  yes                               
