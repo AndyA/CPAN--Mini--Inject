@@ -9,6 +9,7 @@ META.json
 META.yml
 README
 t/.mcpani/config
+t/.mcpani/config_with_whitespaces
 t/.mcpani/config_bad
 t/.mcpani/config_badremote
 t/.mcpani/config_mcpi

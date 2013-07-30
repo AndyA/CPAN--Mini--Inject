@@ -159,7 +159,7 @@ sub parse_config {
 
     while ( <$fh> ) {
       next if /^\s*#/;
-      $self->{$1} = $2 if /([^:\s]+)\s*:\s*(.*)$/;
+      $self->{$1} = $2 if /^\s*([^:\s]+)\s*:\s*(.*?)\s*$/;
       delete $required{$1} if defined $required{$1};
     }
 
