@@ -403,12 +403,17 @@ sub inject {
 
   my %updatedir;
   my %already_injected;
+  my %report;
   for my $modline ( @{ $self->{modulelist} } ) {
     my ( $module, $version, $file ) = split( /\s+/, $modline );
 
-    next if $already_injected{$file}++;
-
     my $target = $self->config->get( 'local' ) . '/authors/id/' . $file;
+
+    # collect all modules of a target/file
+    # needed for report
+    push @{ $report{$target} }, $module;
+    next if $already_injected{$module}++;
+
     my $source
      = $self->config->get( 'repository' ) . '/authors/id/' . $file;
 
@@ -420,7 +425,19 @@ sub inject {
      or croak "Copy $source to $tdir failed: $!";
 
     $self->_updperms( $target );
-    print "$target ... injected $module\n" if $verbose;
+  }
+
+  # if verbose report target file and the modules it contains
+  if ( $verbose ) {
+    for my $target (keys %report) {
+        my $target_str = "$target ... injected modules : ";
+        my $fmt = '%' . length($target_str) . "s%s\n";
+        my @modules = @{ $report{$target} };
+        printf $fmt, $target_str, shift @modules;    # first line with target
+        for my $module ( @modules ) {                # rest only the module
+            printf $fmt, '', $module;
+        }
+    }
   }
 
   for my $dir ( keys( %updatedir ) ) {
