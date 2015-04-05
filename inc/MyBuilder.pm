@@ -1,6 +1,13 @@
 package MyBuilder;
+use strict;
 
 use base qw( Module::Build );
+
+use FindBin;
+use Cwd qw(realpath);
+use File::Spec::Functions;
+
+use Pod::Markdown;
 
 sub create_build_script {
   my ( $self, @args ) = @_;
@@ -83,6 +90,27 @@ sub ACTION_tidy {
     system 'perltidy', '-b', $file;
     unlink "$file.bak" if $? == 0;
   }
+}
+
+sub ACTION_docs {
+
+  my $self = shift;
+
+  my $inject_pm   = catfile($FindBin::Bin, "lib", "CPAN", "Mini", "Inject.pm");
+  my $readme_md   = catfile($FindBin::Bin, "README.md");
+
+  my $parser = Pod::Markdown->new( perldoc_url_prefix => 'metacpan' );
+
+  open my $in_file,  "<", $inject_pm or die "Failed to open '$inject_pm': $!\n";
+  open my $out_file, ">", $readme_md or die "Failed to open '$readme_md': $!\n";
+
+  $parser->output_fh($out_file);
+  $parser->parse_file($in_file);
+
+  close $out_file;
+  close $in_file;
+
+  return $self->SUPER::ACTION_docs;
 }
 
 1;

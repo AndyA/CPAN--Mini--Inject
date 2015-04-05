@@ -38,10 +38,12 @@ my $builder = MyBuilder->new(
     'IO::Zlib'                  => 0,
     'LWP::Simple'               => 0,
     'Pod::Usage'                => 0,
+    'Pod::Markdown'             => 0,
     'Test::More'                => 0,
     'YAML'                      => 0,
     'File::Slurp'               => 0,
     'File::Temp'                => 0,
+    'FindBin'                   => 0,
   },
   add_to_cleanup =>
    [ 'CPAN-Mini-Inject-*', 't/local/WRITEREPO', 't/local/MYCPAN' ],

@@ -8,6 +8,7 @@ MANIFEST
 META.json
 META.yml
 README
+README.md
 t/.mcpani/config
 t/.mcpani/config_with_whitespaces
 t/.mcpani/config_bad
