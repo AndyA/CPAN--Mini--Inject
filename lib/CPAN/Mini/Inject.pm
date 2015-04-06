@@ -67,6 +67,7 @@ allows method chaining. For example:
 A C<CPAN::Mini::Inject> ISA L<CPAN::Mini>. Refer to the
 L<documentation|CPAN::Mini> for that module for details of the interface
 C<CPAN::Mini::Inject> inherits from it.
+=cut 
 
 =item C<new>
 

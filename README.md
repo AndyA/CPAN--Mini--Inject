@@ -210,18 +210,18 @@ under the same terms as Perl itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 71:
+- Around line 72:
 
     '=item' outside of any '=over'
 
-- Around line 279:
+- Around line 280:
 
     You forgot a '=back' before '=head3'
 
-- Around line 365:
+- Around line 366:
 
     '=item' outside of any '=over'
 
-- Around line 712:
+- Around line 713:
 
     You forgot a '=back' before '=head1'
