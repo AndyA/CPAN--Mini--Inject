@@ -69,6 +69,8 @@ L<documentation|CPAN::Mini> for that module for details of the interface
 C<CPAN::Mini::Inject> inherits from it.
 =cut 
 
+=over 4
+
 =item C<new>
 
 Create a new CPAN::Mini::Inject object.
@@ -277,6 +279,8 @@ The tar.gz of the module.
 
 =back
 
+=back
+
 =head3 Example
 
   add( module => 'Module::Name',
@@ -362,6 +366,8 @@ sub add {
 
   return $self;
 }
+
+=over 4
 
 =item C<added_modules>
 
@@ -709,6 +715,8 @@ sub _fmtdate {
   my @date = split( /\s+/, scalar( gmtime ) );
   return "$date[0], $date[2] $date[1] $date[4] $date[3] GMT";
 }
+
+=back 
 
 =head1 See Also
 
