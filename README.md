@@ -1,6 +1,6 @@
 # NAME
 
-CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
+[CPAN::Mini::Inject](https://metacpan.org/pod/CPAN::Mini::Inject) - Inject modules into a [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini) mirror.
 
 # VERSION
 
@@ -27,7 +27,7 @@ probably want to look at the [mcpani](https://metacpan.org/pod/mcpani) command i
 
 # DESCRIPTION
 
-CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
+[CPAN::Mini::Inject](https://metacpan.org/pod/CPAN::Mini::Inject) uses [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini) to build or update a local CPAN mirror
 then adds modules from your repository to it, allowing the inclusion
 of private modules in a minimal CPAN mirror.
 
@@ -45,87 +45,87 @@ A `CPAN::Mini::Inject` ISA [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini). Re
 [documentation](https://metacpan.org/pod/CPAN::Mini) for that module for details of the interface
 `CPAN::Mini::Inject` inherits from it.
 
-## `new`
+- `new`
 
-Create a new CPAN::Mini::Inject object.
+    Create a new CPAN::Mini::Inject object.
 
-## `config_class( [CLASS] )`
+- `config_class( [CLASS] )`
 
-Returns the name of the class handling the configuration.
+    Returns the name of the class handling the configuration.
 
-With an argument, it sets the name of the class to handle
-the config. To use that, you'll have to call it before you
-load the configuration.
+    With an argument, it sets the name of the class to handle
+    the config. To use that, you'll have to call it before you
+    load the configuration.
 
-## `config`
+- `config`
 
-Returns the configuration object. This object should be from
-the class returned by `config_class` unless you've done something
-weird.
+    Returns the configuration object. This object should be from
+    the class returned by `config_class` unless you've done something
+    weird.
 
-## `loadcfg( [FILENAME] )`
+- `loadcfg( [FILENAME] )`
 
-This is a bridge to CPAN::Mini::Inject::Config's loadconfig. It sets the
-filename for the configuration, or uses one of the defaults.
+    This is a bridge to CPAN::Mini::Inject::Config's loadconfig. It sets the
+    filename for the configuration, or uses one of the defaults.
 
-## `parsecfg()`
+- `parsecfg()`
 
-This is a bridge to CPAN::Mini::Inject::Config's parseconfig.
+    This is a bridge to CPAN::Mini::Inject::Config's parseconfig.
 
-## `site( [SITE] )`
+- `site( [SITE] )`
 
-Returns the CPAN site that CPAN::Mini::Inject chose from the
-list specified in the `remote` directive.
+    Returns the CPAN site that CPAN::Mini::Inject chose from the
+    list specified in the `remote` directive.
 
-## `testremote`
+- `testremote`
 
-Test each site listed in the remote parameter of the config file by performing
-a get on each site in order for authors/01mailrc.txt.gz. The first site to
-respond successfully is set as the instance variable site.
+    Test each site listed in the remote parameter of the config file by performing
+    a get on each site in order for authors/01mailrc.txt.gz. The first site to
+    respond successfully is set as the instance variable site.
 
-    print "$mcpi->{site}\n"; # ftp://ftp.cpan.org/pub/CPAN
+        print "$mcpi->{site}\n"; # ftp://ftp.cpan.org/pub/CPAN
 
-`testremote` accepts an optional parameter to enable verbose mode.
+    `testremote` accepts an optional parameter to enable verbose mode.
 
-## `update_mirror`
+- `update_mirror`
 
-This is a subclass of CPAN::Mini.
+    This is a subclass of CPAN::Mini.
 
-## `add`
+- `add`
 
-Add a new module to the repository. The add method copies the module
-file into the repository with the same structure as a CPAN site. For
-example CPAN-Mini-Inject-0.01.tar.gz is copied to
-MYCPAN/authors/id/S/SS/SSORICHE. add creates the required directory
-structure below the repository.
+    Add a new module to the repository. The add method copies the module
+    file into the repository with the same structure as a CPAN site. For
+    example CPAN-Mini-Inject-0.01.tar.gz is copied to
+    MYCPAN/authors/id/S/SS/SSORICHE. add creates the required directory
+    structure below the repository.
 
-Packages found in the distribution will be added to the module list
-(for example both `CPAN::Mini::Inject` and `CPAN::Mini::Inject::Config`
-will be added to the `modules/02packages.details.txt.gz` file).
+    Packages found in the distribution will be added to the module list
+    (for example both `CPAN::Mini::Inject` and `CPAN::Mini::Inject::Config`
+    will be added to the `modules/02packages.details.txt.gz` file).
 
-Packages will be looked for in the `provides` key of the META file if present,
-otherwise the files in the dist will be searched.
-See [Dist::Metadata](https://metacpan.org/pod/Dist::Metadata) for more information.
+    Packages will be looked for in the `provides` key of the META file if present,
+    otherwise the files in the dist will be searched.
+    See [Dist::Metadata](https://metacpan.org/pod/Dist::Metadata) for more information.
 
-- module
+    - module
 
-    The name of the module to add.
-    The distribution file will be searched for modules
-    but you can specify the main one explicitly.
+        The name of the module to add.
+        The distribution file will be searched for modules
+        but you can specify the main one explicitly.
 
-- authorid
+    - authorid
 
-    CPAN author id. This does not have to be a real author id.
+        CPAN author id. This does not have to be a real author id.
 
-- version
+    - version
 
-    The modules version number.
-    Module names and versions will be determined,
-    but you can specify one explicitly.
+        The modules version number.
+        Module names and versions will be determined,
+        but you can specify one explicitly.
 
-- file
+    - file
 
-    The tar.gz of the module.
+        The tar.gz of the module.
 
 ### Example
 
@@ -134,44 +134,44 @@ See [Dist::Metadata](https://metacpan.org/pod/Dist::Metadata) for more informati
          version => 0.01,
          file => './Module-Name-0.01.tar.gz' );
 
-## `added_modules`
+- `added_modules`
 
-Returns a list of hash references describing the modules added by this instance.
-Each hashref will contain `file`, `authorid`, and `modules`.
-The `modules` entry is a hashref of module names and versions included in the `file`.
+    Returns a list of hash references describing the modules added by this instance.
+    Each hashref will contain `file`, `authorid`, and `modules`.
+    The `modules` entry is a hashref of module names and versions included in the `file`.
 
-The list is cumulative.
-There will be one entry for each time ["add"](#add) was called.
+    The list is cumulative.
+    There will be one entry for each time ["add"](#add) was called.
 
-This functionality is mostly provided for the included [mcpani](https://metacpan.org/pod/mcpani) script
-to be able to verbosely print all the modules added.
+    This functionality is mostly provided for the included [mcpani](https://metacpan.org/pod/mcpani) script
+    to be able to verbosely print all the modules added.
 
-## `inject`
+- `inject`
 
-Insert modules from the repository into the local CPAN::Mini mirror. inject
-copies each module into the appropriate directory in the CPAN::Mini mirror
-and updates the CHECKSUMS file.
+    Insert modules from the repository into the local CPAN::Mini mirror. inject
+    copies each module into the appropriate directory in the CPAN::Mini mirror
+    and updates the CHECKSUMS file.
 
-Passing a value to `inject` enables verbose mode, which lists each module
-as it's injected.
+    Passing a value to `inject` enables verbose mode, which lists each module
+    as it's injected.
 
-## `updpackages`
+- `updpackages`
 
-Update the CPAN::Mini mirror's modules/02packages.details.txt.gz with the
-injected module information.
+    Update the CPAN::Mini mirror's modules/02packages.details.txt.gz with the
+    injected module information.
 
-## `updauthors`
+- `updauthors`
 
-Update the CPAN::Mini mirror's authors/01mailrc.txt.gz with
-stub information should the author not actually exist on CPAN
+    Update the CPAN::Mini mirror's authors/01mailrc.txt.gz with
+    stub information should the author not actually exist on CPAN
 
-## `readlist`
+- `readlist`
 
-Load the repository's modulelist.
+    Load the repository's modulelist.
 
-## `writelist`
+- `writelist`
 
-Write to the repository modulelist.
+    Write to the repository modulelist.
 
 # See Also
 
@@ -205,3 +205,23 @@ Copyright 2008-2009 Shawn Sorichetti, Andy Armstrong, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 71:
+
+    '=item' outside of any '=over'
+
+- Around line 279:
+
+    You forgot a '=back' before '=head3'
+
+- Around line 365:
+
+    '=item' outside of any '=over'
+
+- Around line 712:
+
+    You forgot a '=back' before '=head1'
