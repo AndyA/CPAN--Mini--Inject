@@ -7,7 +7,7 @@ use FindBin;
 use Cwd qw(realpath);
 use File::Spec::Functions;
 
-use Pod::Markdown;
+use Pod::Markdown::Github;
 
 sub create_build_script {
   my ( $self, @args ) = @_;
@@ -99,7 +99,7 @@ sub ACTION_docs {
   my $inject_pm   = catfile($FindBin::Bin, "lib", "CPAN", "Mini", "Inject.pm");
   my $readme_md   = catfile($FindBin::Bin, "README.md");
 
-  my $parser = Pod::Markdown->new( perldoc_url_prefix => 'metacpan' );
+  my $parser = Pod::Markdown::Github->new( perldoc_url_prefix => 'metacpan' );
 
   open my $in_file,  "<", $inject_pm or die "Failed to open '$inject_pm': $!\n";
   open my $out_file, ">", $readme_md or die "Failed to open '$readme_md': $!\n";

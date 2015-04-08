@@ -11,19 +11,21 @@ Version 0.33
 If you're not going to customize the way CPAN::Mini::Inject works you
 probably want to look at the [mcpani](https://metacpan.org/pod/mcpani) command instead.
 
-    use CPAN::Mini::Inject;
+```perl
+use CPAN::Mini::Inject;
 
-    $mcpi=CPAN::Mini::Inject->new;
-    $mcpi->parsecfg('t/.mcpani/config');
+$mcpi=CPAN::Mini::Inject->new;
+$mcpi->parsecfg('t/.mcpani/config');
 
-    $mcpi->add( module   => 'CPAN::Mini::Inject',
-                authorid => 'SSORICHE',
-                version  => ' 0.01',
-                file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
+$mcpi->add( module   => 'CPAN::Mini::Inject',
+            authorid => 'SSORICHE',
+            version  => ' 0.01',
+            file     => 'mymodules/CPAN-Mini-Inject-0.01.tar.gz' )
 
-    $mcpi->writelist;
-    $mcpi->update_mirror;
-    $mcpi->inject;
+$mcpi->writelist;
+$mcpi->update_mirror;
+$mcpi->inject;
+```
 
 # DESCRIPTION
 
@@ -36,10 +38,12 @@ of private modules in a minimal CPAN mirror.
 Each method in CPAN::Mini::Inject returns a CPAN::Mini::Inject object which
 allows method chaining. For example:
 
-    my $mcpi=CPAN::Mini::Inject->new;
-    $mcpi->parsecfg
-         ->update_mirror
-         ->inject;
+```perl
+my $mcpi=CPAN::Mini::Inject->new;
+$mcpi->parsecfg
+     ->update_mirror
+     ->inject;
+```
 
 A `CPAN::Mini::Inject` ISA [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini). Refer to the
 [documentation](https://metacpan.org/pod/CPAN::Mini) for that module for details of the interface
@@ -83,7 +87,9 @@ A `CPAN::Mini::Inject` ISA [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini). Re
     a get on each site in order for authors/01mailrc.txt.gz. The first site to
     respond successfully is set as the instance variable site.
 
-        print "$mcpi->{site}\n"; # ftp://ftp.cpan.org/pub/CPAN
+    ```
+    print "$mcpi->{site}\n"; # ftp://ftp.cpan.org/pub/CPAN
+    ```
 
     `testremote` accepts an optional parameter to enable verbose mode.
 
@@ -129,10 +135,12 @@ A `CPAN::Mini::Inject` ISA [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini). Re
 
 ### Example
 
-    add( module => 'Module::Name',
-         authorid => 'AUTHOR',
-         version => 0.01,
-         file => './Module-Name-0.01.tar.gz' );
+```perl
+add( module => 'Module::Name',
+     authorid => 'AUTHOR',
+     version => 0.01,
+     file => './Module-Name-0.01.tar.gz' );
+```
 
 - `added_modules`
 
