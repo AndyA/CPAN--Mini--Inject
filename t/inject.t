@@ -117,9 +117,10 @@ Description:  Package names found in directory $CPAN/authors/id/
 Columns:      package name, version, path
 Intended-For: Automated fetch routines, namespace documentation.
 Written-By:
-Line-Count:   6
+Line-Count:   7
 Last-Updated:
 
+abbreviation                       0.02  M/MI/MIYAGAWA/abbreviation-0.02.tar.gz
 Acme::Code::Police               2.1828  O/OV/OVID/Acme-Code-Police-2.1828.tar.gz
 BFD                                0.31  R/RB/RBS/BFD-0.31.tar.gz
 CPAN::Mini                         0.17  R/RJ/RJBS/CPAN-Mini-0.17.tar.gz

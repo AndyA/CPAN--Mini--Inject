@@ -457,7 +457,7 @@ sub updpackages {
     $packages{$pkg} = $line;
   };
 
-  $self->_writepkgs( [ sort values %packages ] );
+  $self->_writepkgs( [ sort { lc $a cmp lc $b } values %packages ] );
 }
 
 =head2 C<updauthors>
