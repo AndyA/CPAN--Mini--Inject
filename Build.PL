@@ -18,6 +18,7 @@ my $builder = MyBuilder->new(
     'Karen Etheridge <ether@cpan.org>',
     'Salve J. Nilsen <sjn@cpan.org>',
     'Wolfgang Pecho <pecho@belwue.de>',
+    'Konstantin Yakunin <twinhooker@gmail.com>',
   ],
   dist_version_from => 'lib/CPAN/Mini/Inject.pm',
   configure_requires => { 'Module::Build' => 0.4 },

@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+0.34    2017/07/18
+        Konstantin Yakunin <twinhooker@gmail.com>:
+        - sort packages case insensitively
+
 0.33    2013/07/30
         Wolfgang Pecho <pecho@belwue.de>:
         - allow spaces in configuration file
