@@ -6,10 +6,10 @@ use warnings;
 use lib 't/lib';
 
 BEGIN {
-  eval "use CPANServer";
-
   plan skip_all => "HTTP::Server::Simple required to test update_mirror"
-   if $@;
+   if not eval "use CPANServer; 1";
+  plan skip_all => "Net::EmptyPort required to test update_mirror"
+   if not eval "use Net::EmptyPort; 1";
   plan tests => 8;
 }
 
@@ -18,7 +18,8 @@ use File::Path;
 
 rmtree( [ catdir( 't', 'mirror' ) ], 0, 1 );
 
-my $server = CPANServer->new( 11027 );
+my $port = Net::EmptyPort::empty_port;
+my $server = CPANServer->new( $port );
 my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
 sleep 1;
@@ -27,11 +28,12 @@ $SIG{__DIE__} = sub { kill( 9, $pid ) };
 
 my $mcpi = CPAN::Mini::Inject->new;
 $mcpi->parsecfg( 't/.mcpani/config' );
+$mcpi->{config}{remote} =~ s/:\d{5}\b/:$port/;
 
 mkdir( catdir( 't', 'mirror' ) );
 
 $mcpi->update_mirror(
-  remote => 'http://localhost:11027',
+  remote => "http://localhost:$port",
   local  => catdir( 't', 'mirror' )
 );
 

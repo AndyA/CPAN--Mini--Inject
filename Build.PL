@@ -40,6 +40,7 @@ my $builder = MyBuilder->new(
     'LWP::Simple'               => 0,
     'Pod::Usage'                => 0,
     'Test::More'                => 0,
+    'Net::EmptyPort'            => 0,
     'YAML'                      => 0,
     'File::Slurp'               => 0,
     'File::Temp'                => 0,
