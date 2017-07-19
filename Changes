@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+0.35    2017/07/19
+        - use Net::EmptyPort to find an empty port to use
+          instead of a hard-coded one
+
 0.34    2017/07/18
         Konstantin Yakunin <twinhooker@gmail.com>:
         - sort packages case insensitively
