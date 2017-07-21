@@ -18,7 +18,7 @@ use Dist::Metadata ();
 
 =head1 NAME
 
-CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
+L<CPAN::Mini::Inject> - Inject modules into a L<CPAN::Mini> mirror.
 
 =head1 VERSION
 
@@ -50,7 +50,7 @@ probably want to look at the L<mcpani> command instead.
 
 =head1 DESCRIPTION
 
-CPAN::Mini::Inject uses CPAN::Mini to build or update a local CPAN mirror
+L<CPAN::Mini::Inject> uses L<CPAN::Mini> to build or update a local CPAN mirror
 then adds modules from your repository to it, allowing the inclusion
 of private modules in a minimal CPAN mirror.
 
@@ -67,8 +67,11 @@ allows method chaining. For example:
 A C<CPAN::Mini::Inject> ISA L<CPAN::Mini>. Refer to the
 L<documentation|CPAN::Mini> for that module for details of the interface
 C<CPAN::Mini::Inject> inherits from it.
+=cut 
 
-=head2 C<new>
+=over 4
+
+=item C<new>
 
 Create a new CPAN::Mini::Inject object.
 
@@ -80,7 +83,7 @@ sub new {
    $_[0];
 }
 
-=head2 C<< config_class( [CLASS] ) >>
+=item C<< config_class( [CLASS] ) >>
 
 Returns the name of the class handling the configuration.
 
@@ -98,7 +101,7 @@ sub config_class {
   $self->{config_class};
 }
 
-=head2 C<< config >>
+=item C<< config >>
 
 Returns the configuration object. This object should be from
 the class returned by C<config_class> unless you've done something
@@ -114,7 +117,7 @@ sub config {
   $self->{config};
 }
 
-=head2 C<< loadcfg( [FILENAME] ) >>
+=item C<< loadcfg( [FILENAME] ) >>
 
 
 This is a bridge to CPAN::Mini::Inject::Config's loadconfig. It sets the
@@ -134,7 +137,7 @@ sub loadcfg {
   return $self;
 }
 
-=head2 C<< parsecfg() >>
+=item C<< parsecfg() >>
 
 This is a bridge to CPAN::Mini::Inject::Config's parseconfig.
 
@@ -152,7 +155,7 @@ sub parsecfg {
   return $self;
 }
 
-=head2 C<< site( [SITE] ) >>
+=item C<< site( [SITE] ) >>
 
 Returns the CPAN site that CPAN::Mini::Inject chose from the
 list specified in the C<remote> directive.
@@ -168,7 +171,7 @@ sub site {
   $self->{site} || '';
 }
 
-=head2 C<testremote>
+=item C<testremote>
 
 Test each site listed in the remote parameter of the config file by performing
 a get on each site in order for authors/01mailrc.txt.gz. The first site to
@@ -207,7 +210,7 @@ sub testremote {
   return $self;
 }
 
-=head2 C<update_mirror>
+=item C<update_mirror>
 
 This is a subclass of CPAN::Mini.
 
@@ -236,7 +239,7 @@ sub update_mirror {
   CPAN::Mini->update_mirror( %options );
 }
 
-=head2 C<add>
+=item C<add>
 
 Add a new module to the repository. The add method copies the module
 file into the repository with the same structure as a CPAN site. For
@@ -273,6 +276,8 @@ but you can specify one explicitly.
 =item * file
 
 The tar.gz of the module.
+
+=back
 
 =back
 
@@ -362,7 +367,9 @@ sub add {
   return $self;
 }
 
-=head2 C<added_modules>
+=over 4
+
+=item C<added_modules>
 
 Returns a list of hash references describing the modules added by this instance.
 Each hashref will contain C<file>, C<authorid>, and C<modules>.
@@ -381,7 +388,7 @@ sub added_modules {
   return @{ $self->{added_modules} ||= [] };
 }
 
-=head2 C<inject>
+=item C<inject>
 
 Insert modules from the repository into the local CPAN::Mini mirror. inject
 copies each module into the appropriate directory in the CPAN::Mini mirror
@@ -436,7 +443,7 @@ sub inject {
   return $self;
 }
 
-=head2 C<updpackages>
+=item C<updpackages>
 
 Update the CPAN::Mini mirror's modules/02packages.details.txt.gz with the
 injected module information.
@@ -460,7 +467,7 @@ sub updpackages {
   $self->_writepkgs( [ sort { lc $a cmp lc $b } values %packages ] );
 }
 
-=head2 C<updauthors>
+=item C<updauthors>
 
 Update the CPAN::Mini mirror's authors/01mailrc.txt.gz with
 stub information should the author not actually exist on CPAN
@@ -499,7 +506,7 @@ sub updauthors {
 
 }
 
-=head2 C<readlist>
+=item C<readlist>
 
 Load the repository's modulelist.
 
@@ -529,7 +536,7 @@ sub readlist {
   return $self;
 }
 
-=head2 C<writelist>
+=item C<writelist>
 
 Write to the repository modulelist.
 
@@ -708,6 +715,8 @@ sub _fmtdate {
   my @date = split( /\s+/, scalar( gmtime ) );
   return "$date[0], $date[2] $date[1] $date[4] $date[3] GMT";
 }
+
+=back 
 
 =head1 See Also
 
