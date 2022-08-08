@@ -24,7 +24,10 @@ my $pid    = $server->background;
 ok( $pid, 'HTTP Server started' );
 sleep 1;
 
-$SIG{__DIE__} = sub { kill( 9, $pid ) };
+$SIG{__DIE__} = sub {
+  return if $^S; # ignore die in an eval block, while process is still running
+  kill( 9, $pid )
+};
 
 my $mcpi = CPAN::Mini::Inject->new;
 $mcpi->parsecfg( 't/.mcpani/config' );
