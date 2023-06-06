@@ -23,7 +23,7 @@ my $builder = MyBuilder->new(
   dist_version_from => 'lib/CPAN/Mini/Inject.pm',
   configure_requires => { 'Module::Build' => 0.4 },
   requires          => {
-    'CPAN::Checksums'           => 0,
+    'CPAN::Checksums'           => '2.13',
     'CPAN::Mini'                => '0.32',
     'Carp'                      => 0,
     'Compress::Zlib'            => 0,

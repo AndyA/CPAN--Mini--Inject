@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 use Test::InDistDir;
 use CPAN::Mini::Inject;
@@ -55,7 +55,13 @@ $mcpi->loadcfg( 't/.mcpani/config' )->parsecfg->readlist->add(
 
 ok( $mcpi->inject,                        'Copy modules' );
 ok( -e "$authors/id/$module", 'Module file exists' );
-ok( -e "$authors/id/S/SS/SSORICHE/CHECKSUMS", 'Checksum created' );
+my $checksum_file = "$authors/id/S/SS/SSORICHE/CHECKSUMS";
+ok( -e "$checksum_file", 'Checksum created' );
+
+open my $chk, '<', $checksum_file;
+my $checksum_text = join "", <$chk>;
+close $chk;
+unlike $checksum_text, qr{$authors/id}, "root path isn't leaked to checksums";
 
 SKIP: {
   skip "Not a UNIX system", 3 if ( $^O =~ /^MSWin|^cygwin/ );
@@ -66,7 +72,7 @@ SKIP: {
     0775, 'Author directory mode set'
   );
   is(
-    ( stat( "$authors/id/S/SS/SSORICHE/CHECKSUMS" ) )[2] & 07777,
+    ( stat( "$checksum_file" ) )[2] & 07777,
     0664, 'Checksum file mode set'
   );
 }
@@ -106,7 +112,7 @@ $gzauthread->gzclose;
 ok( $author_was_injected,      'author injected into 01mailrc.txt.gz' );
 ok( $author_was_injected == 1, 'author injected exactly 1 time' );
 
-unlink( "$authors/id/S/SS/SSORICHE/CHECKSUMS" );
+unlink( "$checksum_file" );
 unlink( "$authors/id/$module" );
 unlink( "$mycpan/modulelist" );
 unlink( "$modules/02packages.details.txt.gz" );

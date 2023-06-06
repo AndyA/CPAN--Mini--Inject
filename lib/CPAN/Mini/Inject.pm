@@ -3,7 +3,7 @@ package CPAN::Mini::Inject;
 use strict;
 use warnings;
 
-use CPAN::Checksums qw( updatedir );
+use CPAN::Checksums 2.13 qw( updatedir );
 use CPAN::Mini;
 use CPAN::Mini::Inject::Config;
 use Carp;
@@ -424,9 +424,10 @@ sub inject {
   }
 
   for my $dir ( keys( %updatedir ) ) {
-    my $authdir = $self->config->get( 'local' ) . "/authors/id/$dir";
+    my $root    = $self->config->get( 'local' ) . "/authors/id";
+    my $authdir = "$root/$dir";
 
-    updatedir( $authdir );
+    updatedir( $authdir, $root );
     $self->_updperms( "$authdir/CHECKSUMS" );
   }
 
