@@ -44,6 +44,7 @@ my $builder = MyBuilder->new(
     'YAML'                      => 0,
     'File::Slurp'               => 0,
     'File::Temp'                => 0,
+    'Test::InDistDir'           => 0,
   },
   add_to_cleanup =>
    [ 'CPAN-Mini-Inject-*', 't/local/WRITEREPO', 't/local/MYCPAN' ],
