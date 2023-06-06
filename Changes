@@ -1,5 +1,9 @@
 Revision history for CPAN-Mini-Inject
 
+0.36    2023/06/06
+        - implement compatibility with new toolchain cpan_path regime
+        - skip permission tests on cygwin
+
 0.35    2017/07/19
         - use Net::EmptyPort to find an empty port to use
           instead of a hard-coded one
