@@ -58,7 +58,7 @@ ok( -e "$authors/id/$module", 'Module file exists' );
 ok( -e "$authors/id/S/SS/SSORICHE/CHECKSUMS", 'Checksum created' );
 
 SKIP: {
-  skip "Not a UNIX system", 3 if ( $^O =~ /^MSWin/ );
+  skip "Not a UNIX system", 3 if ( $^O =~ /^MSWin|^cygwin/ );
   is( ( stat( "$authors/id/$module" ) )[2] & 07777,
     0664, 'Module file mode set' );
   is(

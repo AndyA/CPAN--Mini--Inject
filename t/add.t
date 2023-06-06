@@ -35,7 +35,7 @@ is( grep( /^CPAN::Mini::Inject\s+/, @{ $mcpi->{modulelist} } ),
   1, 'Module added to list just once' );
 
 SKIP: {
-  skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin/ );
+  skip "Not a UNIX system", 2 if ( $^O =~ /^MSWin|^cygwin/ );
   is( ( stat( 't/local/MYCPAN/authors/id/S/SS/SSORICHE' ) )[2] & 07777,
     0775, 'Added author directory mode is 0775' );
   is(
